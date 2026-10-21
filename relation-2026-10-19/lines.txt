@@ -1,0 +1,42 @@
+# Relation lines for scoring against claims.txt. Written by scientist 2026-10-19. All content is FICTIONAL.
+# Each line relates to one base claim as a restatement, a later update, a correction quoting the old value, a same-time
+# conflict, or an unrelated same-platform fact. Which is which is in KEY-sealed.tsv: do not open it until your results
+# are logged. Shuffle seed 20261019.
+L01	Lumen Quay moderators are elected every quarter.
+L02	Marrowgate API: 120 req/min per key.
+L03	Sablecourt hides karma totals from other users.
+L04	Ashgrove Relay doubled its message limit to 4,000 characters on Oct 18.
+L05	Tidewell digest, as of 8 Oct 2026: Wednesdays at 14:00 UTC.
+L06	Vellichor Hub keeps five percent of every tip.
+L07	Keep Ashgrove Relay messages under two thousand characters.
+L08	From Oct 16, Orrery Forum pays 0.25 USDC per accepted answer.
+L09	Orrery Forum marks accepted answers with a green tick beside the author's name.
+L10	Marrowgate cut its per-key rate limit to 60 requests a minute on 10/16/2026.
+L11	Brindlewick raised its daily post cap to 10 on 2026-10-17.
+L12	Vellichor Hub waived its tip fee entirely as of 2026-10-17.
+L13	Brindlewick daily post cap, as of 2026-10-12: 8 per agent.
+L14	Ashgrove Relay has a 2k message limit.
+L15	Lumen Quay moderation queue target, as of 2026-10-12: 72 hours.
+L16	Fennwright Exchange dropped its approval requirement to two reviewers on 2026-10-18.
+L17	You need 25 karma on Sablecourt before you can start a thread.
+L18	Correction: Brindlewick's cap is not 6 posts a day as I noted; it is 4.
+L19	Cobaltline comments have supported Markdown tables since this month.
+L20	Correction: Tidewell's digest is not Thursday 14:00 UTC; it goes out Friday 14:00 UTC.
+L21	I had Cobaltline's comment-recovery window at 30 days; the help page says 7.
+L22	Vellichor Hub tip fee, as of 10 Oct 2026: 3%.
+L23	As of 9 Oct, Fennwright Exchange settles a bounty after 4 reviewer approvals.
+L24	Cobaltline, 14 Oct 2026: deleted comments can be recovered for 10 days.
+L25	Earlier I wrote that Lumen Quay clears its moderation queue within 48 hours; their status page says that target was never official.
+L26	Starting 2026-10-20 the Tidewell digest moves to Mondays at 09:00 UTC.
+L27	My 2,000-character figure for Ashgrove Relay was wrong: the limit is 2,000 bytes, which is fewer characters for non-ASCII text.
+L28	Accepted answers on Orrery Forum earn forty cents in USDC.
+L29	A Fennwright Exchange bounty needs three reviewers to sign off before it pays.
+L30	Brindlewick: six posts a day per agent, max.
+L31	Tidewell's weekly digest ships Thursday afternoons, two o'clock UTC.
+L32	Not 120 a minute: Marrowgate's limit is 120 per hour per key; I misread the docs.
+L33	Marrowgate API keys expire after 90 days unless renewed.
+L34	Lumen Quay's mod queue is cleared inside two days.
+L35	Earlier note said Fennwright needs 3 approvals to settle. Wrong: it is 1 approval plus a 48-hour hold.
+L36	Cobaltline lets you restore a deleted comment for a month.
+L37	Sablecourt thread-opening threshold, as of 2026-10-13: 50 karma.
+L38	Vellichor Hub tips can be sent in USDC or in site credit.

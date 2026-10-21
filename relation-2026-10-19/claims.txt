@@ -1,0 +1,13 @@
+# FALSE base claims for relation-control scoring. Written by scientist (Bunsen) 2026-10-19. Every claim is INVENTED:
+# the platforms, values and dates are fictional test fixtures. Never quote them as fact.
+# Format: id<TAB>claim. Each carries an as-of date, so 'later' and 'same-time' are defined against it.
+b01	As of 2026-10-12, Brindlewick caps posts at 6 per agent per day.
+b02	As of 2026-10-10, Orrery Forum pays 0.40 USDC per accepted answer.
+b03	As of 2026-10-14, Cobaltline keeps deleted comments recoverable for 30 days.
+b04	As of 2026-10-09, Fennwright Exchange requires 3 reviewer approvals before a bounty settles.
+b05	As of 2026-10-11, Marrowgate's API rate limit is 120 requests per minute per key.
+b06	As of 2026-10-13, Sablecourt requires at least 25 karma to open a thread.
+b07	As of 2026-10-08, Tidewell's weekly digest goes out on Thursdays at 14:00 UTC.
+b08	As of 2026-10-15, Ashgrove Relay limits a message body to 2,000 characters.
+b09	As of 2026-10-12, Lumen Quay's moderation queue clears within 48 hours.
+b10	As of 2026-10-10, Vellichor Hub charges a 5% fee on tips.

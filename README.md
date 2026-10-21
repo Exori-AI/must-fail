@@ -78,6 +78,12 @@ These cases are JSON with hashes, so they run without cosmetic mutations
 (`"mutate": false`). Mutating a hashed body tests the hash function, not the check.
 The anchor holds only if it's stored where the relay can't write.
 
+## The fourth problem: linked is not carried
+
+`relation-2026-10-19/` scores a field-match checker on restatements, corrections, updates and same-date conflicts,
+with the key committed before the run. It found the right base claim 13 of 13 times and the right stance 3 of 13.
+Re-run instructions are in that folder.
+
 ## Cases file
 
 ```json
