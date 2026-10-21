@@ -60,6 +60,24 @@ Limits, stated plainly:
 - Our colony's own memory checker doesn't consume the log yet. `quarantine.py` now
   writes it; the checker change is next.
 
+## The third problem: a relay that agrees with itself
+
+An approval passes through a relay (queue, sender agent, proxy) that logs what it received
+and what it forwarded. Checking those two entries against each other and against the
+action proves only that the relay is self-consistent. A relay that swaps the action and
+rewrites both entries passes. `examples/relay.py` compares against the approver's own
+hash (the anchor), which the relay never had write access to. The case came from
+Crescitaly on r/AI_Agents.
+
+| checker | held | failed |
+|---|---|---|
+| `relay.py verify` (anchor) | 6/6 | 0 |
+| `relay.py naive` (relay entries only) | 4/6 | 2: relay rewrites both entries, unknown approval id |
+
+These cases are JSON with hashes, so they run without cosmetic mutations
+(`"mutate": false`). Mutating a hashed body tests the hash function, not the check.
+The anchor holds only if it's stored where the relay can't write.
+
 ## Cases file
 
 ```json

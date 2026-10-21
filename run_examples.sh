@@ -33,3 +33,6 @@ python3 mustfail.py --cmd "python3 targets/quarantine_after.py --source t" --cas
 echo "== the naive substring check, for contrast =="
 python3 mustfail.py --cmd "python3 examples/naive_scan.py" --cases cases/scan.json | tail -1 || true
 echo "reports in $T"
+echo "== relay: approver anchor vs the relay's own two entries =="
+python3 mustfail.py --cmd "python3 examples/relay.py verify --anchors cases/relay-anchors.jsonl" --cases cases/relay.json | tail -1 || true
+python3 mustfail.py --cmd "python3 examples/relay.py naive" --cases cases/relay.json | tail -1 || true

@@ -1,0 +1,38 @@
+[
+ {
+  "id": "genuine",
+  "expect": "accept",
+  "input": "{\"approval_id\": \"ap-1\", \"action\": \"transfer 40 USDC to acct-7781 for invoice 0193\", \"received_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\", \"forwarded_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\"}",
+  "mutate": false
+ },
+ {
+  "id": "relay-rewrites-both",
+  "expect": "refuse",
+  "input": "{\"approval_id\": \"ap-1\", \"action\": \"transfer 4000 USDC to acct-6620 for invoice 0193\", \"received_sha\": \"51a75420a7e15ca95a7195925a3d5fcfde386409d1c9d5bd905bc7a90e17d350\", \"forwarded_sha\": \"51a75420a7e15ca95a7195925a3d5fcfde386409d1c9d5bd905bc7a90e17d350\"}",
+  "mutate": false
+ },
+ {
+  "id": "forwarded-differs",
+  "expect": "refuse",
+  "input": "{\"approval_id\": \"ap-1\", \"action\": \"transfer 4000 USDC to acct-6620 for invoice 0193\", \"received_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\", \"forwarded_sha\": \"51a75420a7e15ca95a7195925a3d5fcfde386409d1c9d5bd905bc7a90e17d350\"}",
+  "mutate": false
+ },
+ {
+  "id": "action-swapped-entries-kept",
+  "expect": "refuse",
+  "input": "{\"approval_id\": \"ap-1\", \"action\": \"transfer 4000 USDC to acct-6620 for invoice 0193\", \"received_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\", \"forwarded_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\"}",
+  "mutate": false
+ },
+ {
+  "id": "unknown-approval",
+  "expect": "refuse",
+  "input": "{\"approval_id\": \"ap-9\", \"action\": \"transfer 40 USDC to acct-7781 for invoice 0193\", \"received_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\", \"forwarded_sha\": \"a45ca52267bf5af8088c17ad381a6ad2d4f61cb49f15dfadd87844f14e0ce344\"}",
+  "mutate": false
+ },
+ {
+  "id": "not-json",
+  "expect": "refuse",
+  "input": "approve ap-1",
+  "mutate": false
+ }
+]
