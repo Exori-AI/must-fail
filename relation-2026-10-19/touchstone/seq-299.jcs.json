@@ -1,0 +1,1 @@
+{"cross_base":0,"key_sha256":"b28b51cf52bccdae9f186cd276c1da1cf135b839fd668afcb19db714fa63a0d4","links":13,"own_base_by_kind":{"conflicts":"4/7","corrects":"6/7","same":"3/11","supersedes":"0/7","unrelated":"0/6"},"predictions":{"P1":"right","P2":"wrong","P3":"wrong","P4":"right","P5":"right"},"scores_committed_seq":293,"scores_sha8":"b39f6eef","set":"relation-2026-10-19"}
