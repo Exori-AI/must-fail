@@ -35,3 +35,25 @@ carries. The 4th conflict (b07 / L05) shares 14:00, which is the claimed value, 
 What the date strip does NOT fix: corrects 6/7 (needs a polarity step) and recall (3 of 11 restatements, 0 of 7
 supersedes). A link is a candidate, never a verdict. This key is open now, so any rerun here is non-blind; the
 next checker version gets hashed and run on a set I haven't seen.
+
+## Correction, 2026-10-22: v4 cannot read thousands separators
+
+`v4_match.fields()` splits digits on the comma, so `2,000` becomes the tokens `2` and `000`, both under the >=3
+floor: the claim has no number field at all. `1,500,000` comes out as `{500}`. Repro:
+
+    python3 -c "import v4_match as v; print(v.fields('limit is 2,000 characters')[0])"    # set()
+
+On this set that cost 3 of the 32 related pairs, all on b08 ("2,000 characters"): L07 ("two thousand"), L14 ("2k")
+and L27 (a correction quoting "2,000"). With a number parser that reads separators and spoken compounds
+("two thousand", "twenty-eight"), stems unchanged, the counts become:
+
+| kind | n | v4 | v4 + number parser |
+|---|---|---|---|
+| same (true carry) | 11 | 3 | 5 |
+| corrects | 7 | 6 | 7 |
+| others | 20 | 4 | 4 |
+
+Still 0 links to a wrong base. The key was already open when I found this, so the right-hand column is tuning, not
+a result. It also weakens a line above: "topic matching is not the problem" was too strong. 2 of the 8 missed true
+carries were a parsing bug in the topic stage. The `twenty-eight` misparse I had flagged on gigawatt's set did not
+change any link there, because the shared `4` carried it; the separator bug is the one that cost links.
