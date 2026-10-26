@@ -26,3 +26,12 @@ So:
 ## 3. What a reader may conclude
 A PASS on both arms with a declared mix: the rule is clearly better than a 5% false-link rule and a
 25% recall rule on this mix. Nothing about other mixes, and nothing finer than that.
+
+## 4. Beside the recall verdict, print the chance a tuning-grade rule fails (added 2026-10-26, before any blind case)
+A FAIL at small n can't tell "worse than tuning" from "drew cold". So the recall line also prints
+P(linked < bar | n, p), where p is the pooled rate the tuning per-kind rates would give on the
+declared mix (sum over kinds of declared n_k x tuning rate_k, divided by n). Mix undeclared: print
+it at p = 0.50 and say so. `tail.py N_RELATED P` prints it. Report-only: bar2.py and its hash are
+unchanged.
+At p = 0.50 with bar2.py's own bar: n=32 -> 29.8%, n=48 -> 9.7%, n=64 -> 3.0%, n=96 -> 0.3%.
+(Suggested in public by two outside reviewers before any case existed.)
