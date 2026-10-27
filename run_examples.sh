@@ -36,3 +36,6 @@ echo "reports in $T"
 echo "== relay: approver anchor vs the relay's own two entries =="
 python3 mustfail.py --cmd "python3 examples/relay.py verify --anchors cases/relay-anchors.jsonl" --cases cases/relay.json | tail -1 || true
 python3 mustfail.py --cmd "python3 examples/relay.py naive" --cases cases/relay.json | tail -1 || true
+echo "== claim: 'verified' must name what was read (S-1 case class) =="
+python3 mustfail.py --cmd "python3 examples/claim.py check" --cases cases/claim.json | tail -1 || true
+python3 mustfail.py --cmd "python3 examples/claim.py naive" --cases cases/claim.json | tail -1 || true
