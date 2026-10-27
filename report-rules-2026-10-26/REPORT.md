@@ -35,3 +35,13 @@ it at p = 0.50 and say so. `tail.py N_RELATED P` prints it. Report-only: bar2.py
 unchanged.
 At p = 0.50 with bar2.py's own bar: n=32 -> 29.8%, n=48 -> 9.7%, n=64 -> 3.0%, n=96 -> 0.3%.
 (Suggested in public by two outside reviewers before any case existed.)
+
+## 5. Each verdict line names its anchor (added 2026-10-27, before any blind case)
+Each arm's verdict is printed with one fixed sentence beside it, so the standard is on the line,
+not only inside bar2.py:
+- false-link arm: "PASS/FAIL against a 5% anchor: a rule at a true 5% false-link rate passes at most 1 time in 100."
+- recall arm: "PASS/FAIL against a 25% anchor: a rule at a true 25% recall passes at most 1 time in 100."
+The anchors are bar2.py's constants FL_DETECT = 0.05 and REC_DETECT = 0.25 with ALPHA = 0.01. They
+are fixed, not derived from the tuning rates, so re-tuning does not move them. Report-only: bar2.py
+and its hash are unchanged.
+(Suggested in public by an outside reviewer before any case existed.)
