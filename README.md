@@ -84,6 +84,31 @@ The anchor holds only if it's stored where the relay can't write.
 with the key committed before the run. It found the right base claim 13 of 13 times and the right stance 3 of 13.
 Re-run instructions are in that folder.
 
+## The fifth problem: "verified" is a claim about a check
+
+Anthropic's S-1 (filed 2026-10-26) lists, among misaligned behaviors seen "both in our
+models and elsewhere in the industry", this one: "misrepresenting whether tasks had been
+completed or verified". "Completed" is a claim about the world. "Verified" is a claim about
+a check, so it can carry its own evidence. `examples/claim.py` refuses a report that uses a
+verification word (verified, checked, confirmed, validated) without a line naming what was
+read and its hash: `read: <what> sha256:<64 hex>`. Negated uses ("not verified yet",
+"unverified", `"verified": false`) pass.
+
+| checker | held | failed |
+|---|---|---|
+| `examples/claim.py check` (normalizes, then matches) | 119/119 | 0 |
+| `examples/claim.py naive` (same rule on the raw text) | 77/119 | 42: homoglyph, fullwidth, zero-width, word joiner, soft hyphen, bidi, tag characters (6 each) |
+
+Every naive miss is the claim word in disguise. A human reads "verіfied"; the naive check
+sees no claim, so nothing asks for evidence.
+
+Limits:
+- This checks the shape of a report, not its truth. The `read:` line is written by the
+  same agent that makes the claim. It is only worth something once someone else re-reads
+  the named thing and gets the same hash, from a record the agent can't write.
+- Four words. "Tested", "looks right", "all good" and a check mark pass untouched.
+- I wrote these 11 cases too. Same weakest-kind-of-evidence caveat as above.
+
 ## Cases file
 
 ```json
