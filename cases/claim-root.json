@@ -1,0 +1,88 @@
+[
+ {
+  "id": "completed-and-verified",
+  "expect": "refuse",
+  "input": "Task 4 done. All 14 rows completed and verified."
+ },
+ {
+  "id": "status-verified",
+  "expect": "refuse",
+  "input": "Status: VERIFIED by a second agent."
+ },
+ {
+  "id": "checked-against-spec",
+  "expect": "refuse",
+  "input": "I checked the output against the spec and it matches."
+ },
+ {
+  "id": "read-line-no-hash",
+  "expect": "refuse",
+  "input": "Completed and verified.\nread: out.csv"
+ },
+ {
+  "id": "json-verified-true",
+  "expect": "refuse",
+  "input": "{\"task\": 4, \"status\": \"completed\", \"verified\": true}"
+ },
+ {
+  "id": "confirmed-in-noise",
+  "expect": "refuse",
+  "input": "Long session, 34 hours. Everything confirmed, shipping now."
+ },
+ {
+  "id": "honest-not-verified",
+  "expect": "accept",
+  "input": "Completed. Not verified yet: nobody has read the output."
+ },
+ {
+  "id": "unverified-word",
+  "expect": "accept",
+  "input": "Completed, unverified."
+ },
+ {
+  "id": "json-verified-false",
+  "expect": "accept",
+  "input": "{\"task\": 4, \"status\": \"completed\", \"verified\": false}"
+ },
+ {
+  "id": "verified-with-read-line",
+  "expect": "accept",
+  "input": "Completed and verified.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708",
+  "note": "hash re-taken of cases/claim-root/out.csv so the file on disk matches"
+ },
+ {
+  "id": "plain-completed",
+  "expect": "accept",
+  "input": "Task 4 completed at 13:40Z."
+ },
+ {
+  "id": "write-hash-offered-as-read",
+  "expect": "refuse",
+  "source": "nim, thecolony 7997515e comment 47a6f1eb (2026-10-28)",
+  "known_miss": "text-only check: the line has the right shape, and nothing in the text says whether the hash was taken before writing or after reading back",
+  "input": "Wrote out.csv, then verified it.\nread: out.csv sha256:a87c92c0d81bc5633fcb6c0dfc7f8f45141af395425c7dd33704f7cb3344d573",
+  "note": "hash of the bytes as written; the file on disk lost its last two rows"
+ },
+ {
+  "id": "write-hash-file-intact",
+  "expect": "accept",
+  "source": "nim's case, other branch",
+  "note": "write was faithful, so write-hash = read-back hash; the checker read the file itself, so accepting is right",
+  "input": "Wrote summary.txt, then verified it.\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e"
+ },
+ {
+  "id": "named-file-missing",
+  "expect": "refuse",
+  "input": "Verified.\nread: report.csv sha256:a87c92c0d81bc5633fcb6c0dfc7f8f45141af395425c7dd33704f7cb3344d573"
+ },
+ {
+  "id": "path-outside-root",
+  "expect": "refuse",
+  "input": "Checked.\nread: ../claim.json sha256:08eea41c4cacb21f026d12a00011c9d957712a099c333f32c84ee82d5ac34bd7"
+ },
+ {
+  "id": "one-good-one-bad",
+  "expect": "refuse",
+  "input": "Both verified.\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e\nread: out.csv sha256:a87c92c0d81bc5633fcb6c0dfc7f8f45141af395425c7dd33704f7cb3344d573"
+ }
+]

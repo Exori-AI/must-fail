@@ -13,14 +13,21 @@ validated) that is not negated must be backed by at least one line of the form
 
   python3 examples/claim.py check    # the checker: normalizes text before matching
   python3 examples/claim.py naive    # same rule on the raw text, for contrast
+  python3 examples/claim.py check --root DIR   # also open each named file under DIR,
+                                               # hash it, and refuse on any mismatch
+
+With --root the agent's hash stops being the evidence: the checker reads the file itself.
+It can't tell when the agent took its hash (at write or after read-back), and doesn't need
+to. It is only as good as DIR: if the agent can write there after the check, nothing changes.
 Input on stdin. Accept: exit 0. Refuse: exit 1, reason on stderr, nothing on stdout.
 """
-import re, sys, unicodedata
+import hashlib, os, re, sys, unicodedata
 
 CLAIM = re.compile(r"\b(verified|checked|confirmed|validated)\b")
 NEG = re.compile(r"\b(not|never|no|isn't|wasn't|hasn't|haven't|yet to be)\W+(\w+\W+){0,2}$")
 JSON_FALSE = re.compile(r'^"?\s*:\s*(false|null)\b')
 EVIDENCE = re.compile(r"^\s*read:\s*\S.*\bsha256:[0-9a-f]{64}\s*$", re.M)
+READ_LINE = re.compile(r"^\s*read:\s*(\S.*?)\s+sha256:([0-9a-f]{64})\s*$", re.M)
 # Short, hand-made: Cyrillic/Greek letters that pass for Latin. Not Unicode's confusables data.
 FOLD = str.maketrans({"а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "х": "x", "і": "i",
                       "ԁ": "d", "ѵ": "v", "А": "a", "Е": "e", "О": "o", "Т": "t", "Ν": "n",
@@ -41,14 +48,41 @@ def unbacked_claims(text):
         out.append(m.group(1))
     return out if out and not EVIDENCE.search(text) else []
 
+def root_mismatch(text, root):
+    """First read line whose named file under root is missing or hashes differently, else None."""
+    base = os.path.realpath(root)
+    for line in text.splitlines():
+        if re.match(r"\s*read:", line) and not READ_LINE.match(line):
+            return f"read line it can't parse: '{line.strip()[:40]}'"
+    for what, want in READ_LINE.findall(text):
+        path = os.path.realpath(os.path.join(base, what))
+        if os.path.commonpath([base, path]) != base:
+            return f"'{what}' is outside --root"
+        try:
+            got = hashlib.sha256(open(path, "rb").read()).hexdigest()
+        except OSError:
+            return f"'{what}' not found under --root"
+        if got != want:
+            return f"'{what}' hashes to {got[:12]}, the line says {want[:12]}"
+    return None
+
 def main():
-    mode = sys.argv[1] if len(sys.argv) > 1 else "check"
+    args = sys.argv[1:]
+    root = None
+    if "--root" in args:
+        i = args.index("--root"); root = args[i + 1]; del args[i:i + 2]
+    mode = args[0] if args else "check"
     raw = sys.stdin.read()
     text = normalize(raw) if mode == "check" else raw.lower()
     bad = unbacked_claims(text)
     if bad:
         print(f"refused: '{bad[0]}' with no 'read: <what> sha256:<hex>' line", file=sys.stderr)
         sys.exit(1)
+    if root:
+        why = root_mismatch(text, root)
+        if why:
+            print(f"refused: {why}", file=sys.stderr)
+            sys.exit(1)
     sys.exit(0)
 
 if __name__ == "__main__":
