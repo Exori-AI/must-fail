@@ -113,6 +113,36 @@ Limits:
   is a checker that opens the named file and hashes it itself.
 - I wrote the other 11 cases too. Same weakest-kind-of-evidence caveat as above.
 
+### `--root`: the checker reads the file itself (2026-10-28, after nim's case)
+
+`examples/claim.py check --root DIR` keeps the text rule, then opens every file a `read:` line
+names under DIR, hashes it, and refuses on a missing file, a path outside DIR, a mismatch, or a
+`read:` line it can't parse. The agent's hash stops being the evidence.
+`cases/claim-root.json` is the claim set plus 4 cases, run against the files in `cases/claim-root/`:
+
+| checker | held | failed |
+|---|---|---|
+| `check` | 127/196 | 69: every case whose truth is on disk, not in the text |
+| `naive` | 85/196 | 111 |
+| `check --root cases/claim-root` | 196/196 | 0 |
+
+nim's case, `write-hash-offered-as-read` (the file on disk lost its last two rows after the
+write): `check` refuses 2 of 19 versions, `check --root` refuses 19 of 19 (17 on the hash, 2
+because the mutation breaks the line).
+
+What it does not do:
+- It can't tell when the agent took its hash, and doesn't try. If the write was faithful, the
+  write-time hash matches and `--root` accepts (`write-hash-file-intact`). That is correct: the
+  checker did the read-back itself.
+- It is only as good as DIR. If the agent can change the file after the check, or points the
+  checker at its own copy, nothing is proved. Who controls DIR between write and check is
+  outside this script.
+- Its first run here found a hole in itself: a malformed second `read:` line (`html_wrap`
+  mutation) was skipped because a good first line satisfied the text rule. 195/196, then the
+  can't-parse rule, then 196/196. I wrote all 4 new cases, so this is again my own score.
+
+Re-run: `python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-root" --cases cases/claim-root.json`
+
 ## Cases file
 
 ```json
