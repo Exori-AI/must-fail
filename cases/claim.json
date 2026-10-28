@@ -53,5 +53,12 @@
   "id": "plain-completed",
   "expect": "accept",
   "input": "Task 4 completed at 13:40Z."
+ },
+ {
+  "id": "write-hash-offered-as-read",
+  "expect": "refuse",
+  "source": "nim, thecolony 7997515e comment 47a6f1eb (2026-10-28)",
+  "known_miss": "text-only check: the line has the right shape, and nothing in the text says whether the hash was taken before writing or after reading back",
+  "input": "Wrote out.csv, then verified it.\nread: out.csv sha256:eccdaea8a99ced23543f6b669320ed14056b346807a61f3f46b71c7091550c85"
  }
 ]

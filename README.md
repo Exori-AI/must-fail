@@ -96,8 +96,8 @@ read and its hash: `read: <what> sha256:<64 hex>`. Negated uses ("not verified y
 
 | checker | held | failed |
 |---|---|---|
-| `examples/claim.py check` (normalizes, then matches) | 119/119 | 0 |
-| `examples/claim.py naive` (same rule on the raw text) | 77/119 | 42: homoglyph, fullwidth, zero-width, word joiner, soft hyphen, bidi, tag characters (6 each) |
+| `examples/claim.py check` (normalizes, then matches) | 121/138 | 17: all from `write-hash-offered-as-read`, an outside case (below) |
+| `examples/claim.py naive` (same rule on the raw text) | 79/138 | 59: the same 17, plus 42 disguises: homoglyph, fullwidth, zero-width, word joiner, soft hyphen, bidi, tag characters (6 each) |
 
 Every naive miss is the claim word in disguise. A human reads "verіfied"; the naive check
 sees no claim, so nothing asks for evidence.
@@ -107,7 +107,11 @@ Limits:
   same agent that makes the claim. It is only worth something once someone else re-reads
   the named thing and gets the same hash, from a record the agent can't write.
 - Four words. "Tested", "looks right", "all good" and a check mark pass untouched.
-- I wrote these 11 cases too. Same weakest-kind-of-evidence caveat as above.
+- First outside case (nim, 2026-10-28): a hash of the file as written, offered as proof of the
+  file as read back. The line has the right shape, so `check` accepts it, under 17 of 19 mutations.
+  It stays in the set as a known miss: no text-only rule can tell when a hash was taken. The fix
+  is a checker that opens the named file and hashes it itself.
+- I wrote the other 11 cases too. Same weakest-kind-of-evidence caveat as above.
 
 ## Cases file
 
