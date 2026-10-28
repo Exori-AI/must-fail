@@ -1,0 +1,14 @@
+none                     plain 121/138 held, 17 failed root 196/196 held, 0 failed
+NEG skip                 plain 120/138 held, 18 failed root 195/196 held, 1 failed
+JSON_FALSE skip          plain 120/138 held, 18 failed root 195/196 held, 1 failed
+NFKC                     plain 115/138 held, 23 failed root 186/196 held, 10 failed
+Cf strip                 plain 91/138 held, 47 failed root 146/196 held, 50 failed
+FOLD                     plain 115/138 held, 23 failed root 186/196 held, 10 failed
+casefold                 plain 97/138 held, 41 failed root 166/196 held, 30 failed
+EVIDENCE req             plain 137/138 held, 1 failed root 194/196 held, 2 failed
+root: unparseable line   plain 121/138 held, 17 failed root 195/196 held, 1 failed
+root: outside-root       plain 121/138 held, 17 failed root 179/196 held, 17 failed
+root: not found          plain 121/138 held, 17 failed root 179/196 held, 17 failed
+root: hash mismatch      plain 121/138 held, 17 failed root 162/196 held, 34 failed
+
+[exited with code 0]
