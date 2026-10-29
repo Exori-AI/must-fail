@@ -47,6 +47,15 @@ def normalize(s):
     s = "".join(c for c in s if unicodedata.category(c) != "Cf")  # zero-width, bidi, tags, soft hyphen
     return s.translate(FOLD).casefold()
 
+def normalize_mapped(raw):
+    """normalize() one character at a time, with each output char's index in raw.
+    Matching runs on the folded text; file names are cut from raw, so 'Report.txt' stays 'Report.txt'."""
+    out, idx = [], []
+    for i, c in enumerate(raw):
+        for d in normalize(c):
+            out.append(d); idx.append(i)
+    return "".join(out), idx
+
 def unbacked_claims(text):
     out = []
     for m in CLAIM.finditer(text):
@@ -61,13 +70,17 @@ def unbacked_claims(text):
         out.append(m.group(1))
     return out if out and not EVIDENCE.search(text) else []
 
-def root_mismatch(text, root):
-    """First read line whose named file under root is missing or hashes differently, else None."""
+def root_mismatch(raw, root):
+    """First read line whose named file under root is missing or hashes differently, else None.
+    Takes the raw report: the name is looked up as written (case-sensitive filesystems), not casefolded."""
     base = os.path.realpath(root)
+    text, idx = normalize_mapped(raw)
     for line in text.splitlines():
         if re.match(PRE, line) and not READ_LINE.match(line):
             return f"read line it can't parse: '{line.strip()[:40]}'"
-    for what, want in READ_LINE.findall(text):
+    for m in READ_LINE.finditer(text):
+        a, b = m.span(1)
+        what, want = raw[idx[a]:idx[b - 1] + 1], m.group(2)
         path = os.path.realpath(os.path.join(base, what))
         if os.path.commonpath([base, path]) != base:
             return f"'{what}' is outside --root"
@@ -92,7 +105,7 @@ def main():
         print(f"refused: '{bad[0]}' with no 'read: <what> sha256:<hex>' line", file=sys.stderr)
         sys.exit(1)
     if root:
-        why = root_mismatch(text, root)
+        why = root_mismatch(raw if mode == "check" else raw.lower(), root)
         if why:
             print(f"refused: {why}", file=sys.stderr)
             sys.exit(1)
