@@ -65,6 +65,13 @@ MUTATIONS = {
 # lookalike letters, zero-width characters. (colonist-one on thecolony.cc, 2026-10-29: a layout-only
 # set hid false refusals under markdown_quote, html_wrap and dash_swap.)
 
+# --names-are-lookups: a must-accept case may list "names", the literal object references in it (file
+# names). When a mutation rewrites one of them (upper, homoglyph, zero-width inside the name...), the
+# mutated report points at a different object, so it can't inherit "accept": for a checker that looks
+# names up (claim.py --root) it must be refused. Prose mutations keep "accept". (excelsior on
+# thecolony.cc, 2026-10-29: "a mutation that changes the named file cannot automatically inherit the
+# original acceptance label.")
+
 def run(cmd, text, timeout):
     p = subprocess.run(cmd, input=text.encode("utf-8"), capture_output=True, timeout=timeout)
     return p.returncode, p.stdout, p.stderr
@@ -76,6 +83,8 @@ def main():
                     help="JSON file: list of {id, input, expect: refuse|accept, mutate?: bool}; repeatable")
     ap.add_argument("--mutate-accepts", action="store_true",
                     help="run must-accept cases through every mutation too")
+    ap.add_argument("--names-are-lookups", action="store_true",
+                    help="a mutation that rewrites a case's listed names flips accept to refuse, and skips a refuse")
     ap.add_argument("--only", default=None, help="comma list of mutation names (default: all)")
     ap.add_argument("--allow-stdout-on-refuse", action="store_true",
                     help="don't fail a refusal that still printed to stdout (weaker contract)")
@@ -93,7 +102,7 @@ def main():
     unknown = [n for n in names if n not in MUTATIONS]
     if unknown:
         print(f"unknown mutation(s): {unknown}", file=sys.stderr); return 2
-    rows, bad = [], 0
+    rows, bad, skipped = [], 0, 0
     for c in cases:
         if c["expect"] == "refuse":
             muts = names if c.get("mutate", True) else ["identity"]
@@ -101,27 +110,37 @@ def main():
             muts = names if (a.mutate_accepts and c.get("mutate", True)) else ["identity"]
         for m in muts:
             text = MUTATIONS[m](c["input"])
+            expect, relabel = c["expect"], ""
+            if a.names_are_lookups and expect == "accept" and any(n not in text for n in c.get("names", [])):
+                expect, relabel = "refuse", "name-rewritten"
+            elif a.names_are_lookups and expect == "refuse" and any(n not in text for n in c.get("names", [])):
+                # the rewritten name may be a real object the hash fits ('lower' turns Report.txt into
+                # report.txt): no label either way, so the row is skipped and counted, not scored
+                skipped += 1
+                print(f"skip  {c['id']:<28} {m:<15} [name-rewritten, no label]")
+                continue
             try:
                 rc, out, err = run(cmd, text, a.timeout)
             except subprocess.TimeoutExpired:
                 rc, out, err = None, b"", b"timeout"
-            if c["expect"] == "refuse":
+            if expect == "refuse":
                 ok = rc not in (0, None) and (a.allow_stdout_on_refuse or not out)
                 why = "" if ok else ("accepted (rc 0)" if rc == 0 else "timeout" if rc is None else f"refused but wrote {len(out)}B to stdout")
             else:
                 ok = rc == 0
                 why = "" if ok else f"false refusal (rc {rc})"
             bad += not ok
-            rows.append({"case": c["id"], "expect": c["expect"], "mutation": m, "rc": rc, "ok": ok, "why": why,
+            rows.append({"case": c["id"], "expect": expect, "relabel": relabel, "mutation": m, "rc": rc, "ok": ok, "why": why,
                          "stderr": err.decode("utf-8", "replace")[:200]})
-            print(f"{'ok  ' if ok else 'FAIL'}  {c['id']:<28} {m:<15} rc={rc}  {why}")
+            print(f"{'ok  ' if ok else 'FAIL'}  {c['id']:<28} {m:<15} rc={rc}  {why}{'  [' + relabel + ']' if relabel else ''}")
     held = sum(r["ok"] for r in rows)
     side = {k: (sum(r["ok"] for r in rows if r["expect"] == k), sum(r["expect"] == k for r in rows))
             for k in ("refuse", "accept")}
     # bothireagent on thecolony.cc, 2026-10-29: show what saying no to everything would score.
     print(f"\nrefuse-all baseline: refuse-held {side['refuse'][1]}/{side['refuse'][1]}, accept-held 0/{side['accept'][1]}")
     print(f"refuse-held {side['refuse'][0]}/{side['refuse'][1]}, accept-held {side['accept'][0]}/{side['accept'][1]}"
-          f"  (total {held}/{len(rows)}, {bad} failed; {len(cases)} cases)")
+          f"  (total {held}/{len(rows)}, {bad} failed; {len(cases)} cases"
+          + (f"; {skipped} rows skipped, name rewritten on a must-refuse case" if skipped else "") + ")")
     if a.json:
         json.dump({"cmd": a.cmd, "held": held, "total": len(rows),
                    "refuse_held": side["refuse"][0], "refuse_total": side["refuse"][1],

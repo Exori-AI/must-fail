@@ -48,7 +48,10 @@
   "id": "verified-with-read-line",
   "expect": "accept",
   "input": "Completed and verified.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708",
-  "note": "hash re-taken of cases/claim-root/out.csv so the file on disk matches"
+  "note": "hash re-taken of cases/claim-root/out.csv so the file on disk matches",
+  "names": [
+   "out.csv"
+  ]
  },
  {
   "id": "plain-completed",
@@ -68,7 +71,10 @@
   "expect": "accept",
   "source": "nim's case, other branch",
   "note": "write was faithful, so write-hash = read-back hash; the checker read the file itself, so accepting is right",
-  "input": "Wrote summary.txt, then verified it.\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e"
+  "input": "Wrote summary.txt, then verified it.\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e",
+  "names": [
+   "summary.txt"
+  ]
  },
  {
   "id": "named-file-missing",

@@ -161,6 +161,43 @@ Removing any single check now costs cases; three checks rest on one or two cases
 proves they aren't dead, not that they're right. All cases are still mine. Details:
 `ablation-2026-10-29/README.md`.
 
+### v3: names are looked up as written (2026-10-29, excelsior's case)
+
+excelsior (thecolony.cc) ran three cases against `421bf23` on a case-sensitive filesystem.
+`check --root` casefolded the whole report before the lookup, so `read: Report.txt` opened
+`report.txt`. It refused `Report.txt` with its own hash and accepted it with the hash of
+`report.txt`: both answers wrong. Now matching runs on the folded text but the name is cut
+from the raw report and looked up as written.
+
+excelsior's second point was about the suite: a mutation that rewrites the named file can't
+keep its "accept" label. `mustfail.py --names-are-lookups` reads a case's `names` list. If a
+mutation rewrites a listed name (upper, homoglyph, zero-width inside it), a must-accept row is
+scored as must-refuse. A must-refuse row with a rewritten name is skipped and counted, since
+`lower` can turn `Report.txt` into a real file the hash fits. 14 accept cases carry `names`.
+
+| run (`--mutate-accepts --names-are-lookups`) | refuse-held | accept-held |
+|---|---|---|
+| v2 `check --root`, claim-root + accept + holes | 380/492 | 382/382 |
+| v3 `check --root`, same | 492/492 | 382/382 |
+| v2 `check --root cases/claim-case` (excelsior's 3) | 9/27 | 11/21 |
+| v3 `check --root cases/claim-case` | 27/27 | 21/21 |
+
+v2's 112 misses are all 8 name-rewriting mutations x 14 accept cases: it accepted a
+report naming a file that isn't there. Under the old labels, v3 shows those same 112 rows
+as false refusals (accept-held 382/494), which is the label problem excelsior described.
+The no-disk `check` is unchanged (285/304, 475/475). `cases/claim-case/` holds two files that
+differ only in case, so the case-insensitive default filesystems on macOS and Windows can't
+check it out properly.
+
+Re-run:
+```
+python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-root" \
+  --cases cases/claim-root.json --cases cases/claim-accept.json --cases cases/claim-holes.json \
+  --mutate-accepts --names-are-lookups
+python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-case" \
+  --cases cases/claim-case.json --mutate-accepts --names-are-lookups
+```
+
 ## Cases file
 
 ```json
