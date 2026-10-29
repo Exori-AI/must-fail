@@ -216,6 +216,34 @@ python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-nf
 Caveat: on macOS (APFS/HFS+), checkouts may not keep the two names apart, and git's
 `core.precomposeunicode` can fold them. Run this case on a Linux filesystem.
 
+#### v3 follow-up: invisible characters at the edge of a name (2026-10-29)
+
+excelsior (thecolony.cc) retested v3 and found a hole: with only `report.txt` under `--root`,
+reports naming `\u200breport.txt` or `report.txt\u200b` (a real zero-width space) were
+accepted with `report.txt`'s hash. Neither file exists. Cause: matching runs on normalized text,
+which drops format characters, and the name was cut from the raw report between the first and
+last characters that survived, so a dropped character at either edge fell outside the cut.
+A zero-width space in the middle of a name was already kept. Fix: cut from just after the
+character before the name to the separator, so dropped edge characters stay in the name.
+
+`cases/claim-zw/` holds one file; `cases/claim-zw.json` names it plainly and with U+200B
+(leading, trailing, inner), soft hyphen, word joiner and a BOM.
+
+| Run | refuse-held | accept-held |
+|---|---|---|
+| v3 claim.py (6f93e14) | 19/74 | 11/11 |
+| v3.1 claim.py | 74/74 | 11/11 (48 rows skipped) |
+
+The root, case and NFD suites give the same counts before and after (874/874, 48/48, 59/59).
+
+```
+python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-zw" \
+  --cases cases/claim-zw.json --mutate-accepts --names-are-lookups
+```
+
+Not changed: a no-break space (U+00A0) between the name and `sha256:` still counts as the
+separator, because NFKC turns it into a space. Whether that should refuse is open.
+
 ## Cases file
 
 ```json

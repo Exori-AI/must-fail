@@ -1,0 +1,65 @@
+[
+ {
+  "id": "plain-own-hash",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Verified.\nread: report.txt sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "report.txt"
+  ]
+ },
+ {
+  "id": "zw-lead",
+  "expect": "refuse",
+  "kind": "format-char-edge",
+  "input": "Verified.\nread: \u200breport.txt sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "\u200breport.txt"
+  ]
+ },
+ {
+  "id": "zw-trail",
+  "expect": "refuse",
+  "kind": "format-char-edge",
+  "input": "Verified.\nread: report.txt\u200b sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "report.txt\u200b"
+  ]
+ },
+ {
+  "id": "zw-inner",
+  "expect": "refuse",
+  "kind": "format-char-edge",
+  "input": "Verified.\nread: rep\u200bort.txt sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "rep\u200bort.txt"
+  ]
+ },
+ {
+  "id": "shy-lead",
+  "expect": "refuse",
+  "kind": "format-char-edge",
+  "input": "Verified.\nread: \u00adreport.txt sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "\u00adreport.txt"
+  ]
+ },
+ {
+  "id": "wj-trail",
+  "expect": "refuse",
+  "kind": "format-char-edge",
+  "input": "Verified.\nread: report.txt\u2060 sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "report.txt\u2060"
+  ]
+ },
+ {
+  "id": "bom-lead",
+  "expect": "refuse",
+  "kind": "format-char-edge",
+  "input": "Verified.\nread: \ufeffreport.txt sha256:14e5f1a82ae259f10ccb063e8eff082d4ba12a41df8dc6f8def2decd706f72f1",
+  "names": [
+   "\ufeffreport.txt"
+  ]
+ }
+]
