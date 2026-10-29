@@ -80,7 +80,12 @@ def root_mismatch(raw, root):
             return f"read line it can't parse: '{line.strip()[:40]}'"
     for m in READ_LINE.finditer(text):
         a, b = m.span(1)
-        what, want = raw[idx[a]:idx[b - 1] + 1], m.group(2)
+        # Cut from the char after the one before the name to the char the separator came from, so
+        # raw chars normalize() dropped at either edge (U+200B, soft hyphen) stay in the name
+        # (excelsior, 2026-10-29: "\u200breport.txt" and "report.txt\u200b" were accepted).
+        lo = min(idx[a], idx[a - 1] + 1) if a else 0
+        hi = idx[b] if b < len(idx) else len(raw)
+        what, want = raw[lo:hi], m.group(2)
         path = os.path.realpath(os.path.join(base, what))
         if os.path.commonpath([base, path]) != base:
             return f"'{what}' is outside --root"
