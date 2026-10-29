@@ -1,0 +1,16 @@
+none                                     plain refuse-held 285/304, accept-held 475/475 root refuse-held 361/361, accept-held 494/494
+NEG skip                                 plain refuse-held 285/304, accept-held 418/475 root refuse-held 361/361, accept-held 437/494
+NEG reach across punctuation (v1)        plain refuse-held 209/304, accept-held 475/475 root refuse-held 285/361, accept-held 494/494
+JSON_FALSE skip                          plain refuse-held 285/304, accept-held 456/475 root refuse-held 361/361, accept-held 475/494
+NFKC                                     plain refuse-held 271/304, accept-held 463/475 root refuse-held 342/361, accept-held 480/494
+Cf strip                                 plain refuse-held 210/304, accept-held 475/475 root refuse-held 266/361, accept-held 494/494
+FOLD                                     plain refuse-held 270/304, accept-held 475/475 root refuse-held 342/361, accept-held 494/494
+casefold                                 plain refuse-held 236/304, accept-held 426/475 root refuse-held 308/361, accept-held 428/494
+PENDING skip                             plain refuse-held 285/304, accept-held 418/475 root refuse-held 361/361, accept-held 437/494
+QUESTION skip                            plain refuse-held 285/304, accept-held 456/475 root refuse-held 361/361, accept-held 475/494
+read-line wrappers (quote, bullet, tag)  plain refuse-held 287/304, accept-held 434/475 root refuse-held 361/361, accept-held 450/494
+EVIDENCE req                             plain refuse-held 304/304, accept-held 228/475 root refuse-held 361/361, accept-held 228/494
+root: unparseable line                   plain refuse-held 285/304, accept-held 475/475 root refuse-held 361/361, accept-held 494/494
+root: outside-root                       plain refuse-held 285/304, accept-held 475/475 root refuse-held 342/361, accept-held 494/494
+root: not found                          plain refuse-held 285/304, accept-held 475/475 root refuse-held 342/361, accept-held 494/494
+root: hash mismatch                      plain refuse-held 285/304, accept-held 475/475 root refuse-held 323/361, accept-held 494/494

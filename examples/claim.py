@@ -24,10 +24,19 @@ Input on stdin. Accept: exit 0. Refuse: exit 1, reason on stderr, nothing on std
 import hashlib, os, re, sys, unicodedata
 
 CLAIM = re.compile(r"\b(verified|checked|confirmed|validated)\b")
-NEG = re.compile(r"\b(not|never|no|isn't|wasn't|hasn't|haven't|yet to be)\W+(\w+\W+){0,2}$")
+NEG = re.compile(r"\b(not|never|no|nothing|without|isn't|wasn't|hasn't|haven't|yet to be)\s+(\w+\s+){0,2}$")
+# \s, not \W, between: a comma or colon ends the negation's reach ("No issues, verified." is a claim).
+# Still to happen, not done: "has to be verified", "will be checked", "must be validated".
+PENDING = re.compile(r"\b(to|will|must|should)\s+be\s+$")
+# A question about a check: starts with an auxiliary or who/anyone, ends with "?", and nothing
+# follows it ("Has it been verified? Yes." answers itself, so it is a claim).
+QUESTION = re.compile(r"(^|[.!?\n])[\s>`]*(?:<\w+>)?\s*(has|have|did|was|were|is|are|can|could|who|anyone)\b[^.!?\n]*$")
 JSON_FALSE = re.compile(r'^"?\s*:\s*(false|null)\b')
-EVIDENCE = re.compile(r"^\s*read:\s*\S.*\bsha256:[0-9a-f]{64}\s*$", re.M)
-READ_LINE = re.compile(r"^\s*read:\s*(\S.*?)\s+sha256:([0-9a-f]{64})\s*$", re.M)
+# A read line may sit in a quote, a bullet or one HTML tag: "> read: ...", "- read: ...", "<p>read: ...</p>".
+PRE = r"^[ \t\r>]*(?:<\w+>)?[ \t]*(?:[-*\u2010\u2013\u2014\u2022][ \t]+)?read:"
+POST = r"[ \t\r]*(?:</\w+>)?[ \t\r]*$"
+EVIDENCE = re.compile(PRE + r"[ \t]*\S.*\bsha256:[0-9a-f]{64}" + POST, re.M)
+READ_LINE = re.compile(PRE + r"[ \t]*(\S.*?)[ \t]+sha256:([0-9a-f]{64})" + POST, re.M)
 # Short, hand-made: Cyrillic/Greek letters that pass for Latin. Not Unicode's confusables data.
 FOLD = str.maketrans({"а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "х": "x", "і": "i",
                       "ԁ": "d", "ѵ": "v", "А": "a", "Е": "e", "О": "o", "Т": "t", "Ν": "n",
@@ -45,6 +54,10 @@ def unbacked_claims(text):
             continue
         if JSON_FALSE.match(text[m.end():m.end() + 12]):
             continue
+        if PENDING.search(text[max(0, m.start() - 40):m.start()]):
+            continue
+        if re.match(r"[^.!?\n]*\?[\s`]*(?:</\w+>)?[\s`]*$", text[m.end():]) and QUESTION.search(text[max(0, m.start() - 200):m.start()]):
+            continue
         out.append(m.group(1))
     return out if out and not EVIDENCE.search(text) else []
 
@@ -52,7 +65,7 @@ def root_mismatch(text, root):
     """First read line whose named file under root is missing or hashes differently, else None."""
     base = os.path.realpath(root)
     for line in text.splitlines():
-        if re.match(r"\s*read:", line) and not READ_LINE.match(line):
+        if re.match(PRE, line) and not READ_LINE.match(line):
             return f"read line it can't parse: '{line.strip()[:40]}'"
     for what, want in READ_LINE.findall(text):
         path = os.path.realpath(os.path.join(base, what))
