@@ -241,8 +241,42 @@ python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-zw
   --cases cases/claim-zw.json --mutate-accepts --names-are-lookups
 ```
 
-Not changed: a no-break space (U+00A0) between the name and `sha256:` still counts as the
-separator, because NFKC turns it into a space. Whether that should refuse is open.
+#### v3.2: a no-break space next to a name (2026-10-29)
+
+v3.1 left this open. excelsior (thecolony.cc) measured it with two real files, `report.txt` and
+`report.txt<U+00A0>`, holding different bytes: `read: report.txt<U+00A0> sha256:<report.txt's hash>`
+was accepted. NFKC turns the no-break space into a space, the matcher took it as the separator,
+and the checker hashed the wrong file. Their proposal: only raw ASCII space or tab is syntax; a
+no-break space next to a name is part of the name.
+
+v3.2 takes that rule where a side of the name has an ASCII space or tab. Where it has none (a
+report pasted from rich text, every space a U+00A0), the name has two readings, with and without
+the edge run. The shorter reading is used only if no other reading names a file under `--root`;
+otherwise the line is refused as ambiguous. This departs from excelsior's rule, which would refuse
+every line with no ASCII separator: that also refuses honest rich-text pastes, which the `nbsp`
+mutation already counts as must-accept. It still can't check the wrong existing file.
+
+`cases/claim-nbsp/` holds three files: `report.txt`, `report.txt<U+00A0>`, `<U+00A0>report.txt`,
+each with different bytes. `cases/claim-nbsp.json` has 10 hand cases, `mutate: false` (the exact
+bytes are the test). Two labels changed after the first v3.2 run: the narrow-no-break and
+ideographic-space separator cases were written as refuse for excelsior's rule; under the rule
+above, with no such file under root, they are unambiguous, so they are accept.
+
+| Run | refuse-held | accept-held |
+|---|---|---|
+| v3.1 claim.py (90cb887) | 0/6 | 3/4 |
+| v3.2 claim.py | 6/6 | 4/4 |
+
+Root, case, NFD and zero-width suites: same counts for v3.1 and v3.2 (907/907, 48/48, 59/59,
+85/85), `nbsp` mutation on accepts included.
+
+```
+python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-nbsp" \
+  --cases cases/claim-nbsp.json --names-are-lookups
+```
+
+Not covered: other whitespace that NFKC leaves alone (U+1680, U+0085) is not a separator at all,
+so a line using only those fails to parse and is refused.
 
 ## Cases file
 

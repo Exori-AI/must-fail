@@ -80,12 +80,35 @@ def root_mismatch(raw, root):
             return f"read line it can't parse: '{line.strip()[:40]}'"
     for m in READ_LINE.finditer(text):
         a, b = m.span(1)
-        # Cut from the char after the one before the name to the char the separator came from, so
-        # raw chars normalize() dropped at either edge (U+200B, soft hyphen) stay in the name
+        want = m.group(2)
+        # Raw chars normalize() dropped at either edge (U+200B, soft hyphen) stay in the name
         # (excelsior, 2026-10-29: "\u200breport.txt" and "report.txt\u200b" were accepted).
-        lo = min(idx[a], idx[a - 1] + 1) if a else 0
-        hi = idx[b] if b < len(idx) else len(raw)
-        what, want = raw[lo:hi], m.group(2)
+        # Only a raw ASCII space or tab is syntax around a name (v3.2). NFKC turns a no-break
+        # space into a space, so v3.1 read "report.txt\u00a0 sha256:" as report.txt and checked
+        # the wrong file (excelsior, 2026-10-29). With no ASCII space on a side (rich-text paste:
+        # every space a U+00A0), that side has two readings; the loose one is used only if no
+        # other reading names a file under --root.
+        p = text.rfind("read:", m.start(), a) + 5
+        lead = raw[idx[p]:idx[a]]
+        cut = max(lead.rfind(" "), lead.rfind("\t"))
+        if cut >= 0:
+            los = [idx[p] + cut + 1]
+        else:
+            soft = [i for i, c in enumerate(lead) if normalize(c).isspace()]
+            los = [idx[p] + soft[-1] + 1, idx[p]] if soft else [idx[p]]
+        t0, t1 = idx[b - 1] + 1, idx[m.start(2) - len("sha256:")]
+        trail = raw[t0:t1]
+        cut = min((i for i in (trail.find(" "), trail.find("\t")) if i >= 0), default=-1)
+        if cut >= 0:
+            his = [t0 + cut]
+        else:
+            his = [t0 + next(i for i, c in enumerate(trail) if normalize(c).isspace()), t1]
+        what = raw[los[0]:his[0]]
+        for lo in los:
+            for hi in his:
+                other = raw[lo:hi]
+                if other != what and os.path.lexists(os.path.join(base, other)):
+                    return f"'{what}' is ambiguous: '{other}' also exists under --root"
         path = os.path.realpath(os.path.join(base, what))
         if os.path.commonpath([base, path]) != base:
             return f"'{what}' is outside --root"
