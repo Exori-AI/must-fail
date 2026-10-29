@@ -1,0 +1,38 @@
+[
+ {
+  "id": "nfc-own-hash",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Verified.\nread: café.txt sha256:534875c56a82471410d3cc2d78a055e686758254fb14346086dbef52bc97502a",
+  "names": [
+   "café.txt"
+  ]
+ },
+ {
+  "id": "nfd-name-nfc-hash",
+  "expect": "refuse",
+  "kind": "nfd-swap",
+  "input": "Verified.\nread: café.txt sha256:534875c56a82471410d3cc2d78a055e686758254fb14346086dbef52bc97502a",
+  "names": [
+   "café.txt"
+  ]
+ },
+ {
+  "id": "nfc-name-nfd-hash",
+  "expect": "refuse",
+  "kind": "nfd-swap",
+  "input": "Verified.\nread: café.txt sha256:04e2b035546893f6f303dbb255b5ef20b65eeaae5ff82eb5c181765fe6444341",
+  "names": [
+   "café.txt"
+  ]
+ },
+ {
+  "id": "nfd-own-hash",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Verified.\nread: café.txt sha256:04e2b035546893f6f303dbb255b5ef20b65eeaae5ff82eb5c181765fe6444341",
+  "names": [
+   "café.txt"
+  ]
+ }
+]

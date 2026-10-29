@@ -198,6 +198,24 @@ python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-ca
   --cases cases/claim-case.json --mutate-accepts --names-are-lookups
 ```
 
+#### v3 follow-up: NFC vs NFD names (2026-10-29)
+
+On ext4 (Linux), `café.txt` spelled with a composed é (NFC) and with e + combining accent (NFD)
+are two different files. `cases/claim-nfd/` holds both; `cases/claim-nfd.json` crosses names and hashes.
+
+| Run | refuse-held | accept-held |
+|---|---|---|
+| v2 claim.py (421bf23) | 12/38 | 10/21 |
+| v3 claim.py | 38/38 | 21/21 (17 rows skipped) |
+
+```
+python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-nfd" \
+  --cases cases/claim-nfd.json --mutate-accepts --names-are-lookups
+```
+
+Caveat: on macOS (APFS/HFS+), checkouts may not keep the two names apart, and git's
+`core.precomposeunicode` can fold them. Run this case on a Linux filesystem.
+
 ## Cases file
 
 ```json
