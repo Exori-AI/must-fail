@@ -96,5 +96,32 @@
   "expect": "refuse",
   "source": "exori 2026-10-29: the 10-29 ablation found the unparseable-read-line check dead after read lines learned quotes and bullets",
   "input": "Verified both outputs.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708\nread: summary.txt (hash to follow)"
+ },
+ {
+  "id": "name-as-written-fullwidth",
+  "expect": "refuse",
+  "kind": "name-as-written",
+  "input": "Checked the export.\nread: \uff4fut.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708",
+  "names": [
+   "\uff4fut.csv"
+  ]
+ },
+ {
+  "id": "name-as-written-zero-width",
+  "expect": "refuse",
+  "kind": "name-as-written",
+  "input": "Checked the export.\nread: out\u200b.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708",
+  "names": [
+   "out\u200b.csv"
+  ]
+ },
+ {
+  "id": "name-as-written-zero-width-edge",
+  "expect": "refuse",
+  "kind": "name-as-written",
+  "input": "Checked the export.\nread: \u200bout.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708",
+  "names": [
+   "\u200bout.csv"
+  ]
  }
 ]
