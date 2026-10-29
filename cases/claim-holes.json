@@ -1,0 +1,56 @@
+[
+ {
+  "id": "self-answered-question",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "Has it been verified? Yes, all 14 rows."
+ },
+ {
+  "id": "no-issues-then-claim",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "No issues, verified."
+ },
+ {
+  "id": "nothing-then-claim",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "Nothing to fix, verified."
+ },
+ {
+  "id": "without-then-claim",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "Without errors: checked."
+ },
+ {
+  "id": "pending-then-done",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "It had to be checked, so I checked it. Done."
+ },
+ {
+  "id": "never-failed-claim",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "Never failed once, confirmed."
+ },
+ {
+  "id": "could-question-rhetorical",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "Could it be more verified? It's verified."
+ },
+ {
+  "id": "pending-across-period",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "All rows done, as they had to be. Verified."
+ },
+ {
+  "id": "pending-across-comma",
+  "expect": "refuse",
+  "kind": "hole",
+  "input": "Done; must be, verified."
+ }
+]

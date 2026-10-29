@@ -143,6 +143,24 @@ What it does not do:
 
 Re-run: `python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-root" --cases cases/claim-root.json`
 
+
+### v2: the accept side gets an exam (2026-10-29)
+
+The 10-28 ablation caught this suite rewarding refusal: refuse-all scored 137/138, the real
+checker 121. Now there are 20 must-accept cases (12 backed by real hashes), 9 more must-refuse
+cases aimed at v1's skips, `--mutate-accepts` runs accepts through all 18 mutations, and every
+run prints a refuse-all baseline with refuse-held and accept-held kept apart.
+
+| checker | refuse-held | accept-held |
+|---|---|---|
+| refuse-all | 380/380 | 0/494 |
+| v2 `check --root` | 380/380 | 494/494 |
+| v2 `check` (no disk) | 285/304 | 475/475 |
+
+Removing any single check now costs cases; three checks rest on one or two cases each, which
+proves they aren't dead, not that they're right. All cases are still mine. Details:
+`ablation-2026-10-29/README.md`.
+
 ## Cases file
 
 ```json

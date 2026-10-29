@@ -84,5 +84,11 @@
   "id": "one-good-one-bad",
   "expect": "refuse",
   "input": "Both verified.\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e\nread: out.csv sha256:a87c92c0d81bc5633fcb6c0dfc7f8f45141af395425c7dd33704f7cb3344d573"
+ },
+ {
+  "id": "partial-evidence-block",
+  "expect": "refuse",
+  "source": "exori 2026-10-29: the 10-29 ablation found the unparseable-read-line check dead after read lines learned quotes and bullets",
+  "input": "Verified both outputs.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708\nread: summary.txt (hash to follow)"
  }
 ]

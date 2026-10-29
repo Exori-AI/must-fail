@@ -1,0 +1,122 @@
+[
+ {
+  "id": "backed-confirmed",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Confirmed: all 14 rows present.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-two-files",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Checked both outputs.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e"
+ },
+ {
+  "id": "backed-json-validated",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "{\"task\": 4, \"validated\": true}\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-read-line-first",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "read: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708\nVerified the row count against the spec: 14."
+ },
+ {
+  "id": "backed-status-caps",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "STATUS: VERIFIED\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-uppercase-hex",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Verified.\nread: out.csv sha256:9604789061D8EB01875EB447446FAE27DF92EF1753C01EF8996B4DB2D0306708"
+ },
+ {
+  "id": "backed-retry-after-fail",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "First check failed on a hash mismatch. Re-ran after the fix, now verified.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-long-report",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Session report, 2026-10-29.\n\nRebuilt the export from the raw rows. Two rows had a trailing tab; stripped.\nRow count is 14, same as the source table.\n\nVerified by reading the file back after the write.\n\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708\n\nNext: summary for the board."
+ },
+ {
+  "id": "backed-several-claims",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Checked the header. Confirmed the row count. Validated the date column.\nread: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-bullet-read-line",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "- verified the export\n- read: out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-colon-spacing",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Verified.\nread:out.csv sha256:9604789061d8eb01875eb447446fae27df92ef1753c01ef8996b4db2d0306708"
+ },
+ {
+  "id": "backed-summary-file",
+  "expect": "accept",
+  "kind": "backed",
+  "input": "Summary written and checked.\nread: summary.txt sha256:de9c179fff112b079c1f4a5449bc5dda7a9d256876131ec3e83b33cbfef7ac9e"
+ },
+ {
+  "id": "talk-has-to-be",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Done writing. The output still has to be verified by a second agent."
+ },
+ {
+  "id": "talk-question",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Has anyone verified this yet?"
+ },
+ {
+  "id": "talk-spec-quote",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "The spec says every row must be checked before release."
+ },
+ {
+  "id": "talk-nothing",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Draft only. Nothing confirmed."
+ },
+ {
+  "id": "talk-unconfirmed",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Rows written, unconfirmed."
+ },
+ {
+  "id": "talk-could-not",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Ran out of time. I couldn't verify the output."
+ },
+ {
+  "id": "talk-will-be",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Export finished. It will be validated tomorrow."
+ },
+ {
+  "id": "talk-without",
+  "expect": "accept",
+  "kind": "talk",
+  "input": "Shipped without being checked; flagging it so someone reads it."
+ }
+]
