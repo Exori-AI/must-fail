@@ -384,3 +384,6 @@ plain shell `if` takes exit 3 as failure. Exit codes stay 0 (accept, ascii or co
 `"report.txt\\u00a0"`. A refusal anywhere makes `decision` refuse, whatever earlier lines say.
 Verdicts unchanged: the root, case, NFD, zero-width, NBSP, claim, accept and holes suites give
 byte-identical output on v3.3 and v3.4; fixtures/fs.py 14/14.
+
+Own slip, fourth of its kind: the first version of this section (603ba5c) printed a raw
+no-break space in two places where it meant the escape. Fixed by pasting the tool's output.
