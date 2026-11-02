@@ -1,0 +1,41 @@
+suite: root (907 rows). checks: 17. pairs run: 135, not buildable (same line): 1
+
+check                        sole rows cases joint rows  verdict / partners
+NEG skip                            57     3          0  live
+NEG reach (v1)                      76     4          0  live
+JSON_FALSE skip                     19     1          0  live, thin (1 case)
+NFKC                                48    34          0  live
+Cf strip                           170    34          0  live
+FOLD                                34    34          0  live
+casefold                           127    37         13  live / root: unparseable line (7), read-line wrappers (6)
+PENDING skip                        57     3          0  live
+QUESTION skip                       19     1          0  live, thin (1 case)
+read-line wrappers                  36    14          7  live / casefold (6), root: unparseable line (1)
+EVIDENCE req                       154    14          0  live
+root: unparseable line              11     1         16  live, thin (1 case) / root: not found (8), root: name as written (v3) (8), casefold (7), read-line wrappers (1)
+root: outside-root                  11     1          8  live, thin (1 case) / root: name as written (v3) (8), root: not found (7)
+root: not found                    181    21         15  live / root: unparseable line (8), root: outside-root (7)
+root: hash mismatch                 22     2         16  live, thin (2 cases) / root: name as written (v3) (16)
+root: name as written (v3)         145    17         32  live / root: hash mismatch (16), root: unparseable line (8), root: outside-root (8)
+root: edge chars kept (v3.1)        11     1          0  live, thin (1 case)
+
+sole-guard cases per check (the fixtures that keep it alive):
+  NEG skip: honest-not-verified, talk-nothing, talk-without
+  NEG reach (v1): never-failed-claim, no-issues-then-claim, nothing-then-claim, without-then-claim
+  JSON_FALSE skip: json-verified-false
+  NFKC: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, checked-against-spec, completed-and-verified, confirmed-in-noise, could-question-rhetorical, json-verified-true, named-file-missing, never-failed-claim, no-issues-then-claim, nothing-then-claim, one-good-one-bad, partial-evidence-block, path-outside-root, pending-across-comma, pending-across-period, pending-then-done, read-line-no-hash, self-answered-question, status-verified, verified-with-read-line, without-then-claim, write-hash-file-intact, write-hash-offered-as-read
+  Cf strip: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, checked-against-spec, completed-and-verified, confirmed-in-noise, could-question-rhetorical, json-verified-true, named-file-missing, never-failed-claim, no-issues-then-claim, nothing-then-claim, one-good-one-bad, partial-evidence-block, path-outside-root, pending-across-comma, pending-across-period, pending-then-done, read-line-no-hash, self-answered-question, status-verified, verified-with-read-line, without-then-claim, write-hash-file-intact, write-hash-offered-as-read
+  FOLD: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, checked-against-spec, completed-and-verified, confirmed-in-noise, could-question-rhetorical, json-verified-true, named-file-missing, never-failed-claim, no-issues-then-claim, nothing-then-claim, one-good-one-bad, partial-evidence-block, path-outside-root, pending-across-comma, pending-across-period, pending-then-done, read-line-no-hash, self-answered-question, status-verified, verified-with-read-line, without-then-claim, write-hash-file-intact, write-hash-offered-as-read
+  casefold: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, checked-against-spec, completed-and-verified, confirmed-in-noise, could-question-rhetorical, honest-not-verified, json-verified-true, named-file-missing, never-failed-claim, no-issues-then-claim, nothing-then-claim, one-good-one-bad, partial-evidence-block, path-outside-root, pending-across-comma, pending-across-period, pending-then-done, read-line-no-hash, self-answered-question, status-verified, talk-nothing, talk-question, verified-with-read-line, without-then-claim, write-hash-file-intact, write-hash-offered-as-read
+  PENDING skip: talk-has-to-be, talk-spec-quote, talk-will-be
+  QUESTION skip: talk-question
+  read-line wrappers: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, verified-with-read-line, write-hash-file-intact
+  EVIDENCE req: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, verified-with-read-line, write-hash-file-intact
+  root: unparseable line: partial-evidence-block
+  root: outside-root: path-outside-root
+  root: not found: backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, name-as-written-fullwidth, name-as-written-zero-width, name-as-written-zero-width-edge, named-file-missing, one-good-one-bad, path-outside-root, verified-with-read-line, write-hash-file-intact, write-hash-offered-as-read
+  root: hash mismatch: one-good-one-bad, write-hash-offered-as-read
+  root: name as written (v3): backed-bullet-read-line, backed-colon-spacing, backed-confirmed, backed-json-validated, backed-long-report, backed-read-line-first, backed-retry-after-fail, backed-several-claims, backed-status-caps, backed-summary-file, backed-two-files, backed-uppercase-hex, name-as-written-fullwidth, name-as-written-zero-width, name-as-written-zero-width-edge, verified-with-read-line, write-hash-file-intact
+  root: edge chars kept (v3.1): name-as-written-zero-width-edge
+
+not buildable: FOLD + casefold
