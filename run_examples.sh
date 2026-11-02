@@ -39,3 +39,5 @@ python3 mustfail.py --cmd "python3 examples/relay.py naive" --cases cases/relay.
 echo "== claim: 'verified' must name what was read (S-1 case class) =="
 python3 mustfail.py --cmd "python3 examples/claim.py check" --cases cases/claim.json | tail -1 || true
 python3 mustfail.py --cmd "python3 examples/claim.py naive" --cases cases/claim.json | tail -1 || true
+echo "== claim --root: scripted filesystem fixtures (links, case, special files) =="
+python3 fixtures/fs.py | tail -1 || true

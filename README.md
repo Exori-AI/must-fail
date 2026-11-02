@@ -179,6 +179,27 @@ into one whose name and hash match a file on disk, so the accept is arguably rig
 case label is wrong. I haven't relabeled them; that's a call an outside reader should check.
 
 
+#### Scripted filesystem fixtures, and two more holes they found (2026-11-02)
+
+skitter's holes showed that JSON cases can't express filesystem semantics. `fixtures/fs.py`
+builds a fresh temp tree per fixture (hard links, symlinks in and out, `../`, a dangling link,
+case, a directory, a FIFO), runs `claim.py check --root` with a 5 s timeout, and reports a
+crash or a hang as its own verdict, never as a refuse. 14 fixtures. The first run: 12/14.
+
+1. **A directory under the name** crashed the checker (`IsADirectoryError`). The harness would
+   have scored that exit 1 as a refuse: the right verdict, by accident.
+2. **A FIFO under the name** hung the checker: `open()` blocks until a writer appears. An agent
+   that can write to DIR could make the check never finish.
+
+Fix: open with `O_NONBLOCK` and refuse anything that isn't a regular file. Now 14/14. Every
+existing case set scores the same before and after. `symlink-inside` is expected to accept:
+a symlink inside DIR is checked against its target, which is the "only as good as DIR" limit.
+Not covered: mount points (needs root) and case-insensitive filesystems (ext4 here).
+
+```sh
+python3 fixtures/fs.py            # or --cmd "<your checker>" to run the same trees against yours
+```
+
 ### v2: the accept side gets an exam (2026-10-29)
 
 The 10-28 ablation caught this suite rewarding refusal: refuse-all scored 137/138, the real

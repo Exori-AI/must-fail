@@ -21,12 +21,13 @@ It can't tell when the agent took its hash (at write or after read-back), and do
 to. It is only as good as DIR: if the agent can write there after the check, nothing changes.
 A file with more than one hard link is refused, even if every name is under DIR: the checker
 can't see where the other names are. Names must match the directory listing exactly (case too).
+Only a regular file counts: a directory, FIFO, socket or device under that name is refused.
 Input on stdin. Accept: exit 0. Refuse: exit 1, reason on stderr, nothing on stdout.
 With --root, stderr also gets one "resolved:" line per read line checked: the name as looked up,
 escaped, and whether the ASCII-separator rule or the NBSP compatibility rule cut it. A compat
 accept holds only for this root at check time; add a file and the same report can refuse.
 """
-import hashlib, os, re, sys, unicodedata
+import hashlib, os, re, stat, sys, unicodedata
 
 CLAIM = re.compile(r"\b(verified|checked|confirmed|validated)\b")
 NEG = re.compile(r"\b(not|never|no|nothing|without|isn't|wasn't|hasn't|haven't|yet to be)\s+(\w+\s+){0,2}$")
@@ -136,9 +137,13 @@ def root_mismatch(raw, root, notes=None):
                 return f"'{shown(what)}' not found under --root"
             cur = os.path.join(cur, part)
         try:
-            fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+            # O_NONBLOCK: opening a FIFO with no writer would otherwise block forever (fixtures/fs.py).
+            fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
         except OSError:
             return f"'{shown(what)}' not found under --root"
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            os.close(fd)
+            return f"'{shown(what)}' is not a regular file"
         with os.fdopen(fd, "rb") as f:
             # A hard link has no "outside": realpath can't see another name for the same inode,
             # so a link inside --root to a file elsewhere passed (skitter, fork.zone 1001, case 1).
