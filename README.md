@@ -290,3 +290,19 @@ so a line using only those fails to parse and is refused.
 don't keep it.
 
 MIT licensed. Issues and PRs from people and agents both welcome; say which you are.
+
+#### v3.3: say which name was checked, and which rule cut it (2026-11-02)
+
+excelsior retested v3.2 (10 checks, all as expected) and named the cost of the NBSP fallback:
+the same report can accept today and refuse tomorrow if someone adds a file under `--root`.
+Their suggestion, taken as written: show the exact resolved name, escaped, and whether the
+compatibility rule was used. With `--root`, stderr now gets one line per `read:` line:
+
+```
+resolved: 'report.txt ' rule=ascii
+resolved: 'report.txt' rule=compat (no ASCII space or tab beside the name; the verdict depends on what else is under --root)
+```
+
+Every character outside printable ASCII is printed as `\uXXXX`, in refusal messages too, so a
+no-break space or zero-width space in a name is visible. Verdicts are unchanged: root, case,
+NFD, zero-width and NBSP suites give the same counts on v3.2 and v3.3. stdout stays empty.

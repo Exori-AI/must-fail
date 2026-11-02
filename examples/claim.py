@@ -20,6 +20,9 @@ With --root the agent's hash stops being the evidence: the checker reads the fil
 It can't tell when the agent took its hash (at write or after read-back), and doesn't need
 to. It is only as good as DIR: if the agent can write there after the check, nothing changes.
 Input on stdin. Accept: exit 0. Refuse: exit 1, reason on stderr, nothing on stdout.
+With --root, stderr also gets one "resolved:" line per read line checked: the name as looked up,
+escaped, and whether the ASCII-separator rule or the NBSP compatibility rule cut it. A compat
+accept holds only for this root at check time; add a file and the same report can refuse.
 """
 import hashlib, os, re, sys, unicodedata
 
@@ -70,9 +73,14 @@ def unbacked_claims(text):
         out.append(m.group(1))
     return out if out and not EVIDENCE.search(text) else []
 
-def root_mismatch(raw, root):
+def shown(name):
+    """The name with every char outside printable ASCII escaped, so U+00A0 or U+200B can't hide."""
+    return "".join(c if " " <= c <= "~" else f"\\u{ord(c):04x}" for c in name)
+
+def root_mismatch(raw, root, notes=None):
     """First read line whose named file under root is missing or hashes differently, else None.
-    Takes the raw report: the name is looked up as written (case-sensitive filesystems), not casefolded."""
+    Takes the raw report: the name is looked up as written (case-sensitive filesystems), not casefolded.
+    notes, if a list, gets one line per read line: the name resolved, escaped, and which rule cut it."""
     base = os.path.realpath(root)
     text, idx = normalize_mapped(raw)
     for line in text.splitlines():
@@ -104,20 +112,23 @@ def root_mismatch(raw, root):
         else:
             his = [t0 + next(i for i, c in enumerate(trail) if normalize(c).isspace()), t1]
         what = raw[los[0]:his[0]]
+        if notes is not None:
+            rule = "compat (no ASCII space or tab beside the name; the verdict depends on what else is under --root)" if len(los) > 1 or len(his) > 1 else "ascii"
+            notes.append(f"resolved: '{shown(what)}' rule={rule}")
         for lo in los:
             for hi in his:
                 other = raw[lo:hi]
                 if other != what and os.path.lexists(os.path.join(base, other)):
-                    return f"'{what}' is ambiguous: '{other}' also exists under --root"
+                    return f"'{shown(what)}' is ambiguous: '{shown(other)}' also exists under --root"
         path = os.path.realpath(os.path.join(base, what))
         if os.path.commonpath([base, path]) != base:
-            return f"'{what}' is outside --root"
+            return f"'{shown(what)}' is outside --root"
         try:
             got = hashlib.sha256(open(path, "rb").read()).hexdigest()
         except OSError:
-            return f"'{what}' not found under --root"
+            return f"'{shown(what)}' not found under --root"
         if got != want:
-            return f"'{what}' hashes to {got[:12]}, the line says {want[:12]}"
+            return f"'{shown(what)}' hashes to {got[:12]}, the line says {want[:12]}"
     return None
 
 def main():
@@ -133,7 +144,10 @@ def main():
         print(f"refused: '{bad[0]}' with no 'read: <what> sha256:<hex>' line", file=sys.stderr)
         sys.exit(1)
     if root:
-        why = root_mismatch(raw if mode == "check" else raw.lower(), root)
+        notes = []
+        why = root_mismatch(raw if mode == "check" else raw.lower(), root, notes)
+        for n in notes:
+            print(n, file=sys.stderr)
         if why:
             print(f"refused: {why}", file=sys.stderr)
             sys.exit(1)
