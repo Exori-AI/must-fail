@@ -366,24 +366,26 @@ NFD, zero-width and NBSP suites give the same counts on v3.2 and v3.3. stdout st
 #### v3.4: two names never print alike; `--json` for callers (2026-11-02)
 
 excelsior again, on v3.3: a file named `report.txt` + U+00A0 and a file named `report.txt`
-+ the six characters ` ` each accepted and printed the same `resolved:` line. The verdict
-was right (each opened its own file); the diagnostic couldn't tell them apart. A backslash is
-now printed as `\\`, so the second one reads `report.txt\\u00a0`. `fixtures/display.py` builds
-three such pairs (NBSP, zero-width space, backslash) and fails if any two print the same:
-v3.3 1/3, v3.4 3/3.
++ the six characters `\u00a0` each accepted and printed the same `resolved:` line. The
+verdict was right (each opened its own file); the diagnostic couldn't tell them apart. A
+backslash is now printed doubled, so the second one reads `report.txt\\u00a0`.
+`fixtures/display.py` builds three such pairs (NBSP, zero-width space, backslash) and fails if
+any two print the same: v3.3 1/3, v3.4 3/3.
 
 They also answered my question about a separate exit code for compat accepts: no, because a
 plain shell `if` takes exit 3 as failure. Exit codes stay 0 (accept, ascii or compat) and 1
-(refuse). Callers that need the distinction pass `--json` and get one object on stdout:
+(refuse). Callers that need the distinction pass `--json` and get one object on stdout. For
+the two files above (pasted from the tool's output):
 
 ```
-{"decision": "accept", "reason": null, "lines": [{"name": "report.txt ", "rule": "ascii"}]}
+{"decision": "accept", "reason": null, "lines": [{"name": "report.txt\u00a0", "rule": "ascii"}]}
+{"decision": "accept", "reason": null, "lines": [{"name": "report.txt\\u00a0", "rule": "ascii"}]}
 ```
 
-`name` is the raw name, JSON-escaped, so the two cases above are `"report.txt "` and
-`"report.txt\\u00a0"`. A refusal anywhere makes `decision` refuse, whatever earlier lines say.
-Verdicts unchanged: the root, case, NFD, zero-width, NBSP, claim, accept and holes suites give
-byte-identical output on v3.3 and v3.4; fixtures/fs.py 14/14.
+`name` is the raw name, JSON-escaped. A refusal anywhere makes `decision` refuse, whatever
+earlier lines say. Verdicts unchanged: the root, case, NFD, zero-width, NBSP, claim, accept and
+holes suites give byte-identical output on v3.3 and v3.4; fixtures/fs.py 14/14.
 
-Own slip, fourth of its kind: the first version of this section (603ba5c) printed a raw
-no-break space in two places where it meant the escape. Fixed by pasting the tool's output.
+Own slip, fourth of its kind: the first two versions of this section (603ba5c, 95acaed) printed
+a raw no-break space where they meant the escape. 95acaed claimed the fix and fixed one of
+three. This version was checked for raw U+00A0 bytes before the push.
