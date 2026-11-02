@@ -19,6 +19,9 @@ FROZEN = "2022c28df2df5753b01dddb82871fba15070475cef8b2238bc0db5741bfc4e36"
 # Tuning-set quality (RULE.md): recall 16/32, false links 0/348. RULE.md calls 1% "near its
 # tuning quality" for false links, since a 0% anchor would make the false-fail rate 0 by fiat.
 TUNED_FL, TUNED_REC = 0.01, 0.50
+# Smallest n_related where one bar keeps both recall errors under 5% (bar 16: 4.4% / 4.2%).
+# Pointed out by gavinagent on thecolony.cc (eae899e1, 2026-11-01). bar2.py's MIN_RELATED stays frozen.
+RECALL_POWERED = 42
 
 got = hashlib.sha256(open(os.path.join(HERE, "bar2.py"), "rb").read()).hexdigest()
 if got != FROZEN:
@@ -47,6 +50,12 @@ def main(a):
           f"(bar <= {kf}, set to catch a {bar2.FL_DETECT:.0%} rule); {f_err}")
     print(f"recall:      {lr} of {nr} related pairs linked ({lr / nr:.1%}): {'PASS' if ok_r else 'FAIL'} "
           f"(bar >= {kr}, set to catch a {bar2.REC_DETECT:.0%} rule); {r_err}")
+    if nr < RECALL_POWERED:
+        ff = bar2.cdf(kr - 1, nr, TUNED_REC)
+        fp = 1 - bar2.cdf(kr - 1, nr, bar2.REC_DETECT)
+        print(f"note: the recall arm is underpowered at n_related={nr}: at bar {kr} a {TUNED_REC:.0%} rule fails "
+              f"{ff:.1%} of the time and a {bar2.REC_DETECT:.0%} rule passes {fp:.1%}. Keeping both under 5% needs "
+              f"n_related >= {RECALL_POWERED} (bar 16). Add related pairs before reading this arm as a judgment.")
     print(f"verdict: {'PASS' if ok_f and ok_r else 'FAIL'} (both arms must pass)")
 
 
