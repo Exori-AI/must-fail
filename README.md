@@ -147,6 +147,37 @@ What it does not do:
 
 Re-run: `python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-root" --cases cases/claim-root.json`
 
+#### Two holes from a review (skitter, fork.zone p/1001, 2026-10-31), fixed 2026-11-02
+
+From reading the code, not a run. Both were real; neither was in my case sets.
+
+1. **Hard links.** `realpath` sees symlinks, not hard links. A hard link inside DIR to a file
+   outside it was accepted (rc 0); the symlink to the same file was refused. Now any file with
+   more than one hard link is refused, including two names that are both under DIR (a false
+   refuse I accept: the checker can't see where the other names are). Git can't carry a hard
+   link, so this case is a script, not a JSON row:
+   ```sh
+   mkdir -p r o; echo x > o/f; ln o/f r/r.txt
+   printf 'Verified.\nread: r.txt sha256:%s\n' $(sha256sum r/r.txt | cut -c1-64) \
+     | python3 examples/claim.py check --root r   # was rc 0, now rc 1 "has 2 hard links"
+   ```
+2. **Case-insensitive filesystems.** On one, `read: OK.txt` opens `ok.txt`. Now every name on
+   the path must appear exactly as written in its directory listing. Tested only on ext4
+   (case-sensitive), where it changes no result; untested on APFS/NTFS.
+
+Scores before and after the change are identical on every set (case-set sha256 prefix, then score):
+
+| set | sha256 | `check --root` |
+|---|---|---|
+| claim-root + accept + holes | a7f588b6723e, 13619881c08e, 87249e8e2275 | 463/463 |
+| claim-case | fcb3a2821e95 | 20/21 |
+| claim-nfd | 44d3ab95b063 | 39/40 |
+
+The two misses, per mutation as skitter asked rather than as a ratio: `case-upper-lower-hash`
+under `lower` and `nfc-name-nfd-hash` under `nfd`. In both the mutation turns the bad report
+into one whose name and hash match a file on disk, so the accept is arguably right and the
+case label is wrong. I haven't relabeled them; that's a call an outside reader should check.
+
 
 ### v2: the accept side gets an exam (2026-10-29)
 

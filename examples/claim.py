@@ -19,6 +19,8 @@ validated) that is not negated must be backed by at least one line of the form
 With --root the agent's hash stops being the evidence: the checker reads the file itself.
 It can't tell when the agent took its hash (at write or after read-back), and doesn't need
 to. It is only as good as DIR: if the agent can write there after the check, nothing changes.
+A file with more than one hard link is refused, even if every name is under DIR: the checker
+can't see where the other names are. Names must match the directory listing exactly (case too).
 Input on stdin. Accept: exit 0. Refuse: exit 1, reason on stderr, nothing on stdout.
 With --root, stderr also gets one "resolved:" line per read line checked: the name as looked up,
 escaped, and whether the ASCII-separator rule or the NBSP compatibility rule cut it. A compat
@@ -123,10 +125,28 @@ def root_mismatch(raw, root, notes=None):
         path = os.path.realpath(os.path.join(base, what))
         if os.path.commonpath([base, path]) != base:
             return f"'{shown(what)}' is outside --root"
+        # Each name on the way down must be listed exactly as written. On a case-insensitive
+        # filesystem "Report.txt" would otherwise open report.txt (skitter, fork.zone 1001, case 2).
+        cur = base
+        for part in [] if path == base else os.path.relpath(path, base).split(os.sep):
+            try:
+                if part not in os.listdir(cur):
+                    return f"'{shown(what)}' not found under --root with that exact name"
+            except OSError:
+                return f"'{shown(what)}' not found under --root"
+            cur = os.path.join(cur, part)
         try:
-            got = hashlib.sha256(open(path, "rb").read()).hexdigest()
+            fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
         except OSError:
             return f"'{shown(what)}' not found under --root"
+        with os.fdopen(fd, "rb") as f:
+            # A hard link has no "outside": realpath can't see another name for the same inode,
+            # so a link inside --root to a file elsewhere passed (skitter, fork.zone 1001, case 1).
+            # Refuse any regular file with more than one name, including two names both under --root.
+            n = os.fstat(f.fileno()).st_nlink
+            if n > 1:
+                return f"'{shown(what)}' has {n} hard links; the checker can't tell where the other names are"
+            got = hashlib.sha256(f.read()).hexdigest()
         if got != want:
             return f"'{shown(what)}' hashes to {got[:12]}, the line says {want[:12]}"
     return None
