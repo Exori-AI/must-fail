@@ -27,7 +27,7 @@ With --root, stderr also gets one "resolved:" line per read line checked: the na
 escaped, and whether the ASCII-separator rule or the NBSP compatibility rule cut it. A compat
 accept holds only for this root at check time; add a file and the same report can refuse.
 """
-import hashlib, os, re, stat, sys, unicodedata
+import hashlib, json, os, re, stat, sys, unicodedata
 
 CLAIM = re.compile(r"\b(verified|checked|confirmed|validated)\b")
 NEG = re.compile(r"\b(not|never|no|nothing|without|isn't|wasn't|hasn't|haven't|yet to be)\s+(\w+\s+){0,2}$")
@@ -77,10 +77,12 @@ def unbacked_claims(text):
     return out if out and not EVIDENCE.search(text) else []
 
 def shown(name):
-    """The name with every char outside printable ASCII escaped, so U+00A0 or U+200B can't hide."""
-    return "".join(c if " " <= c <= "~" else f"\\u{ord(c):04x}" for c in name)
+    """The name with every char outside printable ASCII escaped, so U+00A0 or U+200B can't hide.
+    A backslash is doubled, so a real U+00A0 and the six characters \\u00a0 print differently
+    (excelsior, 2026-11-02: both printed 'report.txt\\u00a0' on v3.3)."""
+    return "".join("\\\\" if c == "\\" else c if " " <= c <= "~" else f"\\u{ord(c):04x}" for c in name)
 
-def root_mismatch(raw, root, notes=None):
+def root_mismatch(raw, root, notes=None, lines=None):
     """First read line whose named file under root is missing or hashes differently, else None.
     Takes the raw report: the name is looked up as written (case-sensitive filesystems), not casefolded.
     notes, if a list, gets one line per read line: the name resolved, escaped, and which rule cut it."""
@@ -118,6 +120,8 @@ def root_mismatch(raw, root, notes=None):
         if notes is not None:
             rule = "compat (no ASCII space or tab beside the name; the verdict depends on what else is under --root)" if len(los) > 1 or len(his) > 1 else "ascii"
             notes.append(f"resolved: '{shown(what)}' rule={rule}")
+        if lines is not None:
+            lines.append({"name": what, "rule": "compat" if len(los) > 1 or len(his) > 1 else "ascii"})
         for lo in los:
             for hi in his:
                 other = raw[lo:hi]
@@ -161,22 +165,32 @@ def main():
     root = None
     if "--root" in args:
         i = args.index("--root"); root = args[i + 1]; del args[i:i + 2]
+    # --json: one JSON object on stdout (decision, reason, each read line's raw name and rule).
+    # Exit codes don't change: 0 accept (ascii or compat), 1 refuse (excelsior: a compat exit 3
+    # would take the failure branch of a plain shell `if`).
+    as_json = "--json" in args
+    if as_json:
+        args.remove("--json")
     mode = args[0] if args else "check"
     raw = sys.stdin.read()
     text = normalize(raw) if mode == "check" else raw.lower()
-    bad = unbacked_claims(text)
-    if bad:
-        print(f"refused: '{bad[0]}' with no 'read: <what> sha256:<hex>' line", file=sys.stderr)
-        sys.exit(1)
-    if root:
-        notes = []
-        why = root_mismatch(raw if mode == "check" else raw.lower(), root, notes)
-        for n in notes:
-            print(n, file=sys.stderr)
+    lines = []
+    def done(why):
+        if as_json:
+            print(json.dumps({"decision": "refuse" if why else "accept", "reason": why, "lines": lines}))
         if why:
             print(f"refused: {why}", file=sys.stderr)
-            sys.exit(1)
-    sys.exit(0)
+        sys.exit(1 if why else 0)
+    bad = unbacked_claims(text)
+    if bad:
+        done(f"'{bad[0]}' with no 'read: <what> sha256:<hex>' line")
+    if root:
+        notes = []
+        why = root_mismatch(raw if mode == "check" else raw.lower(), root, notes, lines)
+        for n in notes:
+            print(n, file=sys.stderr)
+        done(why)
+    done(None)
 
 if __name__ == "__main__":
     main()
