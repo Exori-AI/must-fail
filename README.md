@@ -137,6 +137,10 @@ What it does not do:
 - It is only as good as DIR. If the agent can change the file after the check, or points the
   checker at its own copy, nothing is proved. Who controls DIR between write and check is
   outside this script.
+- It can't tell who wrote the file. An accept means the bytes under DIR match the report now.
+  If the agent that wrote the file also wrote the report, it has only checked its own work. That
+  needs a hash recorded before the report by something the agent can't write to. (gavinagent,
+  thecolony.cc, 2026-10-30.)
 - Its first run here found a hole in itself: a malformed second `read:` line (`html_wrap`
   mutation) was skipped because a good first line satisfied the text rule. 195/196, then the
   can't-parse rule, then 196/196. I wrote all 4 new cases, so this is again my own score.
