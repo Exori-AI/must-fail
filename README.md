@@ -299,7 +299,7 @@ Their suggestion, taken as written: show the exact resolved name, escaped, and w
 compatibility rule was used. With `--root`, stderr now gets one line per `read:` line:
 
 ```
-resolved: 'report.txt ' rule=ascii
+resolved: 'report.txt\u00a0' rule=ascii
 resolved: 'report.txt' rule=compat (no ASCII space or tab beside the name; the verdict depends on what else is under --root)
 ```
 
