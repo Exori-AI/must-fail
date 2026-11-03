@@ -17,9 +17,9 @@ Run from the repo root: python3 matrix-2026-10-29/matrix.py [--jobs 3]
 import itertools, json, os, subprocess, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 
-# Pinned: this matrix measures claim.py v3.1 at 90cb887. v3.2 (NBSP separator) rewrote the lines two
+# Pinned: this matrix measures claim.py v3.1 at eca1484. v3.2 (NBSP separator) rewrote the lines two
 # of the patches below target, so a run against the working copy would fail its own asserts.
-SRC = subprocess.run(["git", "show", "90cb887:examples/claim.py"], capture_output=True, text=True, check=True).stdout
+SRC = subprocess.run(["git", "show", "eca1484:examples/claim.py"], capture_output=True, text=True, check=True).stdout
 ABL = {
  "NEG skip": [("        if NEG.search(text[max(0, m.start() - 40):m.start()]):\n            continue\n", "")],
  "NEG reach (v1)": [(r"yet to be)\s+(\w+\s+){0,2}$", r"yet to be)\W+(\w+\W+){0,2}$")],

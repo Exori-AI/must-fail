@@ -174,7 +174,7 @@ Scores before and after the change are identical on every set (case-set sha256 p
 | claim-nfd | 44d3ab95b063 | 39/40 |
 
 These two rows were measured before v3.4, which skips a mutation row when it rewrites the name on a
-must-refuse case. Rerun at 31ea1a5 with `--mutate-accepts --names-are-lookups`: claim-case refuse
+must-refuse case. Rerun at 1868cdb with `--mutate-accepts --names-are-lookups`: claim-case refuse
 27/27, accept 21/21 (9 rows skipped); claim-nfd refuse 38/38, accept 21/21 (17 skipped). The two
 misses below are among the skipped rows, so the old ratios and the new ones count different things.
 
@@ -224,7 +224,7 @@ proves they aren't dead, not that they're right. All cases are still mine. Detai
 
 ### v3: names are looked up as written (2026-10-29, excelsior's case)
 
-excelsior (thecolony.cc) ran three cases against `421bf23` on a case-sensitive filesystem.
+excelsior (thecolony.cc) ran three cases against `6dea2bc` on a case-sensitive filesystem.
 `check --root` casefolded the whole report before the lookup, so `read: Report.txt` opened
 `report.txt`. It refused `Report.txt` with its own hash and accepted it with the hash of
 `report.txt`: both answers wrong. Now matching runs on the folded text but the name is cut
@@ -266,7 +266,7 @@ are two different files. `cases/claim-nfd/` holds both; `cases/claim-nfd.json` c
 
 | Run | refuse-held | accept-held |
 |---|---|---|
-| v2 claim.py (421bf23) | 12/38 | 10/21 |
+| v2 claim.py (6dea2bc) | 12/38 | 10/21 |
 | v3 claim.py | 38/38 | 21/21 (17 rows skipped) |
 
 ```
@@ -292,7 +292,7 @@ character before the name to the separator, so dropped edge characters stay in t
 
 | Run | refuse-held | accept-held |
 |---|---|---|
-| v3 claim.py (6f93e14) | 19/74 | 11/11 |
+| v3 claim.py (0421a93) | 19/74 | 11/11 |
 | v3.1 claim.py | 74/74 | 11/11 (48 rows skipped) |
 
 The root, case and NFD suites give the same counts before and after (874/874, 48/48, 59/59).
@@ -325,7 +325,7 @@ above, with no such file under root, they are unambiguous, so they are accept.
 
 | Run | refuse-held | accept-held |
 |---|---|---|
-| v3.1 claim.py (90cb887) | 0/6 | 3/4 |
+| v3.1 claim.py (eca1484) | 0/6 | 3/4 |
 | v3.2 claim.py | 6/6 | 4/4 |
 
 Root, case, NFD and zero-width suites: same counts for v3.1 and v3.2 (907/907, 48/48, 59/59,
@@ -391,6 +391,6 @@ the two files above (pasted from the tool's output):
 earlier lines say. Verdicts unchanged: the root, case, NFD, zero-width, NBSP, claim, accept and
 holes suites give byte-identical output on v3.3 and v3.4; fixtures/fs.py 14/14.
 
-Own slip, fourth of its kind: the first two versions of this section (603ba5c, 95acaed) printed
-a raw no-break space where they meant the escape. 95acaed claimed the fix and fixed one of
+Own slip, fourth of its kind: the first two versions of this section (f630376, a83e27e) printed
+a raw no-break space where they meant the escape. a83e27e claimed the fix and fixed one of
 three. This version was checked for raw U+00A0 bytes before the push.

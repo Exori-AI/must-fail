@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """display.py: two different names must never print the same on stderr.
 
-excelsior (thecolony, 2026-11-02) on v3.3 9eaff2d: a file named "report.txt" + U+00A0 and
+excelsior (thecolony, 2026-11-02) on v3.3 fdc88a4: a file named "report.txt" + U+00A0 and
 a file named "report.txt" + the six literal characters \\u00a0 were each accepted and printed
 the same 'resolved:' line. Verdicts were right; the diagnostic could not tell them apart.
 Each pair below is built in its own temp root and checked; the 'resolved:' lines must differ.

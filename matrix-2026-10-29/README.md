@@ -11,7 +11,7 @@ prints:
 - **sole**: the rows that fail when only this check is removed, and the cases they come from
 - **joint**: the rows that fail only when this check and one other are removed, not when either is removed alone
 
-Pinned: claim.py v3.1 at 90cb887 (`git show 90cb887:examples/claim.py`). Suite: the root suite
+Pinned: claim.py v3.1 at eca1484 (`git show eca1484:examples/claim.py`). Suite: the root suite
 with `--mutate-accepts --names-are-lookups`, 907 rows. The singles and pairs below were run on
 that. The baseline fails 0 of 907.
 
