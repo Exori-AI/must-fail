@@ -41,3 +41,18 @@ python3 mustfail.py --cmd "python3 examples/claim.py check" --cases cases/claim.
 python3 mustfail.py --cmd "python3 examples/claim.py naive" --cases cases/claim.json | tail -1 || true
 echo "== claim --root: scripted filesystem fixtures (links, case, special files) =="
 python3 fixtures/fs.py | tail -1 || true
+echo "== the harness itself: exit codes, not printed numbers =="
+# Every line above ends in '| tail -1 || true', so it prints numbers and can't fail: the pipeline
+# takes tail's exit code (the bug in Microsoft's Copilot Cowork write-up, 2026-11-02). This block
+# keeps each exit code and fails the script if any one is not what it must be.
+selfcheck() {  # want, label, args...
+  want=$1; label=$2; shift 2
+  rc=0; python3 mustfail.py "$@" > "$T/self.out" 2>&1 || rc=$?
+  if [ "$rc" -eq "$want" ]; then echo "ok    $label rc=$rc"; else echo "FAIL  $label rc=$rc want $want"; selffail=1; fi
+}
+selffail=0
+echo '[]' > "$T/empty.json"
+selfcheck 0 "fixed checker passes" --cmd "python3 targets/quarantine_after.py --source t" --cases cases/scan.json
+selfcheck 1 "naive checker fails" --cmd "python3 examples/naive_scan.py" --cases cases/scan.json
+selfcheck 3 "zero cases is not a pass" --cmd "cat" --cases "$T/empty.json"
+[ "$selffail" -eq 0 ] || exit 1

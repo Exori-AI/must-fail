@@ -95,9 +95,12 @@ def main():
     cases = []
     for f in a.cases:
         try:
-            cases += json.load(open(f, encoding="utf-8"))
+            got = json.load(open(f, encoding="utf-8"))
         except (OSError, ValueError) as e:
             print(f"cannot read cases {f}: {e}", file=sys.stderr); return 2
+        if not isinstance(got, list) or not all(isinstance(c, dict) for c in got):
+            print(f"cases {f}: expected a JSON list of case objects", file=sys.stderr); return 2
+        cases += got
     names = a.only.split(",") if a.only else list(MUTATIONS)
     unknown = [n for n in names if n not in MUTATIONS]
     if unknown:
@@ -141,12 +144,21 @@ def main():
     print(f"refuse-held {side['refuse'][0]}/{side['refuse'][1]}, accept-held {side['accept'][0]}/{side['accept'][1]}"
           f"  (total {held}/{len(rows)}, {bad} failed; {len(cases)} cases"
           + (f"; {skipped} rows skipped, name rewritten on a must-refuse case" if skipped else "") + ")")
+    # Microsoft's Copilot Cowork write-up, 2026-11-02: "a replay over zero cases would also pass."
+    # So did this harness: an empty case file printed "0 failed" and exited 0. A run that scored no
+    # must-refuse row tested nothing, and says so with its own exit code.
+    if side["refuse"][1] == 0:
+        print("NOTHING CHECKED: 0 must-refuse rows were scored (empty, all-accept, or all-skipped cases)",
+              file=sys.stderr)
+    elif side["accept"][1] == 0:
+        print("warning: 0 must-accept rows, so a checker that refuses everything scores the same",
+              file=sys.stderr)
     if a.json:
         json.dump({"cmd": a.cmd, "held": held, "total": len(rows),
                    "refuse_held": side["refuse"][0], "refuse_total": side["refuse"][1],
                    "accept_held": side["accept"][0], "accept_total": side["accept"][1],
                    "rows": rows}, open(a.json, "w"), indent=1)
-    return 1 if bad else 0
+    return 1 if bad else 3 if side["refuse"][1] == 0 else 0
 
 if __name__ == "__main__":
     sys.exit(main())
