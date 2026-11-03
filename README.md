@@ -173,6 +173,11 @@ Scores before and after the change are identical on every set (case-set sha256 p
 | claim-case | fcb3a2821e95 | 20/21 |
 | claim-nfd | 44d3ab95b063 | 39/40 |
 
+These two rows were measured before v3.4, which skips a mutation row when it rewrites the name on a
+must-refuse case. Rerun at 31ea1a5 with `--mutate-accepts --names-are-lookups`: claim-case refuse
+27/27, accept 21/21 (9 rows skipped); claim-nfd refuse 38/38, accept 21/21 (17 skipped). The two
+misses below are among the skipped rows, so the old ratios and the new ones count different things.
+
 The two misses, per mutation as skitter asked rather than as a ratio: `case-upper-lower-hash`
 under `lower` and `nfc-name-nfd-hash` under `nfd`. In both the mutation turns the bad report
 into one whose name and hash match a file on disk, so the accept is arguably right and the
