@@ -24,13 +24,17 @@ def run(pattern, want, label):
 
 run("must_flag/*.sh", 1, "must_flag")
 run("must_pass/*.sh", 0, "must_pass")
+# Self red-team, 2026-11-05 afternoon: 6 scripts that broke the first version (each checked in bash).
+run("breaks/flag_*.sh", 1, "breaks (should flag)")
+run("breaks/pass_*.sh", 0, "breaks (should pass)")
 got = rc([sys.executable, "pipemask.py", "empty.sh"])
 print(f"empty.sh (no pipeline): exit {got} (expected 3)")
 bad += got != 3
 
 # 3. Known limits: recorded as they are, not counted as failures.
 for f, want_true in [("known_limits/01_subshell_scope.sh", 1), ("known_limits/02_uncalled_function.sh", 1),
-                     ("known_limits/03_heredoc_text.sh", 0)]:
+                     ("known_limits/03_heredoc_text.sh", 0),
+                     ("known_limits/04_subshell_same_line.sh", 0)]:
     got = rc([sys.executable, "pipemask.py", f])
     print(f"known limit {f}: exit {got}, correct answer {want_true}" + ("  (still wrong)" if got != want_true else "  (now right)"))
 

@@ -34,7 +34,8 @@ library only.
 | `must_flag/` (12) | 12/12 flagged |
 | `must_pass/` (10) | 10/10 clean |
 | `empty.sh` | exit 3 |
-| `known_limits/` (3) | 3/3 still wrong, see below |
+| `breaks/` (6, added the same afternoon) | 6/6 right after the fix, 0/6 before |
+| `known_limits/` (4) | 2 still wrong, 2 right by accident, see below |
 
 These fixtures are mine. A tool that passes its author's own fixtures has shown less than one
 that passes someone else's (this repo's tally so far: outside readers found 3 holes, my own
@@ -57,11 +58,32 @@ pipelines across those scripts, 0 flagged. That's 0 flags on code I already knew
 not evidence that the tool finds bugs in the wild. The only real positives so far are the two
 lines from my own session.
 
+## Same afternoon: I tried to break it, and 6 of 10 attempts did
+
+Nobody outside had sent a script yet, so I wrote 10 attempts and ran each one in bash first to get the
+true answer. 6 broke version one (`breaks/`):
+
+- Missed: a pipeline split over two lines with a trailing `|` (bash keeps reading; the tool didn't).
+- Missed: `set -x -e`. It only looked for `e` in the first flag group.
+- False alarm: `set -o errexit -o nounset -o pipefail` and `set -e -u -o pipefail`. Both turn
+  pipefail on; the regex only knew one-group forms. These are common headers, so this was the worst one.
+- False alarm: `shopt -s -o pipefail`.
+- False alarm: `if [ $(cat f | wc -l) -gt 0 ]`. The status read is `[`'s, not the pipeline's.
+
+The 4 it got right: `|&`, a trailing `&&`, `set +e` after `set -euo pipefail`, and a `$( )` inside a
+pipefail script. The fix parses every `set`/`shopt` flag, joins lines ending in `|`, `&&` or `||`,
+and skips pipes that live only inside a `$( )` argument (an assignment `x=$(a | b)` still flags).
+While testing it, my own loop printed `rc=$?` right after `$(basename ...)`, so every rc I read was
+basename's. Same bug class, in the test harness. It's caught by reading, not by this tool: no pipe.
+
+These are still my fixtures. The outside-script ask stands.
+
 ## Known limits (kept as fixtures, not counted as failures)
 
-- `( set -o pipefail; ... )` in a subshell still turns pipefail "on" for the rest of the file
-  (false negative).
-- `set -o pipefail` inside a function that's never called counts the same way (false negative).
+- `( set -o pipefail; ... )` and `f() { set -o pipefail; }` on one line now read as right, but only
+  because a `set` after `(` or `{` isn't parsed at all. That is luck, not scope handling: a multi-line
+  function that's never called still counts.
+- The flip side of that luck: `( set -o pipefail; a | b ) && ...` is now a false alarm (04).
 - A `|` in heredoc text is read as a pipeline (false positive).
 
 It reads line by line: no functions, subshell scope, heredocs or `eval`. A clean run is not a

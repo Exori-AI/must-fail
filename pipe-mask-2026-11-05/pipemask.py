@@ -23,13 +23,46 @@ Exit: 0 no finding, 1 at least one finding, 2 bad arguments/unreadable file,
 import re
 import sys
 
-PIPEFAIL_ON = re.compile(r'\bset\s+(-[a-zA-Z]*o\s+pipefail|-o\s+pipefail)\b|\bset\s+-[a-zA-Z]*\s+-o\s+pipefail\b')
-PIPEFAIL_OFF = re.compile(r'\bset\s+\+o\s+pipefail\b')
-ERREXIT_ON = re.compile(r'\bset\s+-[a-zA-Z]*e[a-zA-Z]*\b|\bset\s+-o\s+errexit\b')
-ERREXIT_OFF = re.compile(r'\bset\s+\+[a-zA-Z]*e[a-zA-Z]*\b|\bset\s+\+o\s+errexit\b')
+SET_CMD = re.compile(r'^\s*(set|shopt)\s+(.*)$')
 READS_STATUS = re.compile(r'\$\?|\$\{\?\}')
 READS_PIPESTATUS = re.compile(r'PIPESTATUS')
 DISCARD = re.compile(r'\|\|\s*(true|:)\s*$')
+
+
+def set_changes(cmd):
+    """Parse `set ...` / `shopt -s|-u -o ...` into {'pipefail': bool, 'errexit': bool} changes.
+
+    Reads every flag token, so `set -x -e`, `set -e -u -o pipefail` and
+    `set -o errexit -o nounset -o pipefail` all count (break cases B-D, 2026-11-05)."""
+    out = {}
+    for seg in re.split(r'&&|\|\|', cmd):
+        m = SET_CMD.match(seg)
+        if not m:
+            continue
+        toks = m.group(2).split()
+        if m.group(1) == 'shopt':
+            flags = ''.join(t[1:] for t in toks if t.startswith('-'))
+            if 'o' in flags and ('s' in flags or 'u' in flags):
+                on = 's' in flags
+                for t in toks:
+                    if not t.startswith('-') and t in ('pipefail', 'errexit'):
+                        out[t] = on
+            continue
+        i = 0
+        while i < len(toks):
+            t = toks[i]
+            if t == '--' or not t[:1] in '-+' or len(t) < 2:
+                break
+            on = t[0] == '-'
+            for ch in t[1:]:
+                if ch == 'e':
+                    out['errexit'] = on
+                elif ch == 'o' and i + 1 < len(toks):
+                    i += 1
+                    if toks[i] in ('pipefail', 'errexit'):
+                        out[toks[i]] = on
+            i += 1
+    return out
 
 
 def strip(line):
@@ -68,6 +101,10 @@ def logical_lines(text):
         if raw.endswith('\\'):
             buf += raw[:-1] + ' '
             continue
+        tail = strip(raw).rstrip()
+        if tail.endswith(('|', '&&', '||')) and not tail.endswith(';;'):
+            buf += raw + ' '  # bash keeps reading after a trailing | && || (break case A)
+            continue
         buf += raw
         lines.append((start, buf))
         buf, start = '', None
@@ -85,6 +122,22 @@ def has_pipe(cmd):
     return bool(re.search(r'(?<!\|)\|(?![|])', cmd.replace('||', '  ')))
 
 
+def outside_subst(cmd):
+    """cmd with every $( ... ) span blanked (nesting-aware)."""
+    out, depth, i = [], 0, 0
+    while i < len(cmd):
+        if cmd.startswith('$(', i):
+            depth += 1; i += 2; continue
+        if depth and cmd[i] == '(':
+            depth += 1
+        elif depth and cmd[i] == ')':
+            depth -= 1; i += 1; continue
+        if not depth:
+            out.append(cmd[i])
+        i += 1
+    return ''.join(out)
+
+
 def check(text, name):
     findings, pipelines = [], 0
     pipefail = errexit = False
@@ -94,14 +147,9 @@ def check(text, name):
         for cmd in commands(s):
             flat.append((no, raw.strip(), cmd))
     for k, (no, raw, cmd) in enumerate(flat):
-        if PIPEFAIL_OFF.search(cmd):
-            pipefail = False
-        if PIPEFAIL_ON.search(cmd):
-            pipefail = True
-        if ERREXIT_OFF.search(cmd):
-            errexit = False
-        elif ERREXIT_ON.search(cmd) and cmd.lstrip().startswith('set'):
-            errexit = True
+        ch = set_changes(cmd)
+        pipefail = ch.get('pipefail', pipefail)
+        errexit = ch.get('errexit', errexit)
         if not has_pipe(cmd):
             continue
         pipelines += 1
@@ -112,6 +160,8 @@ def check(text, name):
             continue
         if DISCARD.search(cmd):
             continue  # `|| true` / `|| :` throws the status away on purpose
+        if not has_pipe(outside_subst(cmd)) and not re.match(r'(local\s+|export\s+|declare\s+)?[A-Za-z_][A-Za-z0-9_]*=\S*\$\(', cmd):
+            continue  # pipes only inside $( ) that is an argument: the status read is the outer command's (break case E)
         stages = [x.strip() for x in re.split(r'(?<!\|)\|(?!\|)', re.split(r'&&|\|\|', cmd)[0])]
         if all(re.match(r'(echo|printf)\b', x) for x in stages[:-1]):
             continue  # only echo/printf on the left: nothing there to fail
