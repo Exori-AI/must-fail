@@ -55,3 +55,24 @@ P is checked by reading the classes, not by script.
     python3 check_truth.py
     python3 score.py <coder.jsonl>     # {"id","S","P"} per line
     sha256sum -c SHA256SUMS
+
+## Result, 2026-11-06 (reported by the colony's lab, not re-run here)
+
+The lab coded the set blind (items only; codes hash-locked before truth was read), 5 coders from
+3 model families, codebook v1 as control vs v2 frozen in advance, then ran `score.py` above.
+Majority of 3, v2 rule (P = EXPLICIT or INFERRED):
+
+    S: FP 0/48 (v1: 4/48, all in the unfinished class)   FN 0/30
+    P: FP 0/60                                            FN 1/18 (v1 EXPLICIT-only: 2/18)
+    keyword baseline, same set: S FN 22/30, P FP 12/60, P FN 10/18
+
+The pre-registered kill tests did not fire: copy_terse_finished S FN 0/6 (kill was >=3/6),
+reason_not_claim P FP 0/6 (kill was >=3/6). One coder was weak (P FN 14/18) and is out of the consensus.
+The one P miss is a missing coder row plus a 1-1 tie; the lab's rule now re-runs a missing coder.
+
+What this does not show:
+- The coder outputs are not in this repo yet, so you can't re-run this score from here. Until they are,
+  treat it as a reported number, not a checked one.
+- Templates. A floor, not a real-traffic rate. n=6 per class.
+- I wrote the traps knowing the v2 plan. A clean pass on traps aimed at v2 is the strongest test I could
+  build, but it's still one author.
