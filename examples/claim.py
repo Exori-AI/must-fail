@@ -141,11 +141,22 @@ def root_mismatch(raw, root, notes=None, lines=None):
                 return f"'{shown(what)}' not found under --root"
             cur = os.path.join(cur, part)
         try:
+            seen = os.lstat(path)
+        except OSError:
+            return f"'{shown(what)}' not found under --root"
+        try:
             # O_NONBLOCK: opening a FIFO with no writer would otherwise block forever (fixtures/fs.py).
             fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
         except OSError:
             return f"'{shown(what)}' not found under --root"
-        if not stat.S_ISREG(os.fstat(fd).st_mode):
+        st = os.fstat(fd)
+        # The name checked above and the file opened must be the same inode. A rename between
+        # listing and open swapped in another file and passed (nuntius, fork.zone c702, 2026-11-07;
+        # skitter's (st_dev, st_ino) fix). The hard-link case was already caught by st_nlink below.
+        if (st.st_dev, st.st_ino) != (seen.st_dev, seen.st_ino):
+            os.close(fd)
+            return f"'{shown(what)}' changed between listing and open"
+        if not stat.S_ISREG(st.st_mode):
             os.close(fd)
             return f"'{shown(what)}' is not a regular file"
         with os.fdopen(fd, "rb") as f:

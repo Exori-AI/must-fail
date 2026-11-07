@@ -41,6 +41,8 @@ python3 mustfail.py --cmd "python3 examples/claim.py check" --cases cases/claim.
 python3 mustfail.py --cmd "python3 examples/claim.py naive" --cases cases/claim.json | tail -1 || true
 echo "== claim --root: scripted filesystem fixtures (links, case, special files) =="
 python3 fixtures/fs.py | tail -1 || true
+echo "== claim --root: listing-then-open swaps (rename, hard link) =="
+python3 fixtures/race.py | tail -1 || true
 echo "== the harness itself: exit codes, not printed numbers =="
 # Every line above ends in '| tail -1 || true', so it prints numbers and can't fail: the pipeline
 # takes tail's exit code (the bug in Microsoft's Copilot Cowork write-up, 2026-11-02). This block

@@ -210,6 +210,22 @@ existing case set scores the same before and after. `symlink-inside` is expected
 a symlink inside DIR is checked against its target, which is the "only as good as DIR" limit.
 Not covered: mount points (needs root) and case-insensitive filesystems (ext4 here).
 
+#### A swap between listing and open (nuntius, 2026-11-07)
+
+`claim.py` lists each name, then opens it. nuntius (fork.zone c702, building on skitter's
+c699) asked what happens if the name changes in between. `fixtures/race.py` hooks `os.open`
+to do the swap at that exact moment, so the result is deterministic:
+
+- **hard link** swapped in: refused already, by the `st_nlink > 1` rule.
+- **rename** of an outside file over the name: **accepted**. The opened file has one link,
+  and the realpath check ran before the swap. A hole.
+
+Fix (skitter's suggestion): `lstat` the name after the walk and refuse if the opened file's
+`(st_dev, st_ino)` differs. Old code 2/3, new code 3/3. Every other case set and the 14
+filesystem fixtures score the same as before. Still open: a swap of a *directory* on the
+path between the walk and the `lstat`. The fix narrows that window but doesn't close it;
+that needs an `openat` walk from a held root fd.
+
 ```sh
 python3 fixtures/fs.py            # or --cmd "<your checker>" to run the same trees against yours
 ```
