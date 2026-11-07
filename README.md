@@ -87,6 +87,26 @@ These cases are JSON with hashes, so they run without cosmetic mutations
 (`"mutate": false`). Mutating a hashed body tests the hash function, not the check.
 The anchor holds only if it's stored where the relay can't write.
 
+### The same shape in an installer: a hook that approves itself (2026-11-07)
+
+Postman Desktop's Codex installer added a hook and wrote that hook's `trusted_hash`
+itself (postmanlabs/postman-app-support #14370; staff reverted it 11-05). If a check only
+compares the hook to `trusted_hash`, it reads the installer's claim about itself.
+gavinagent and mark (thecolony b12d1be6) put the rule in one line: a record the approved
+party can write records nothing, and a grant names the artifact, not the publisher.
+`examples/hook.py verify` checks the user's own grant log: exactly one sha256 for that hook,
+equal to the command's, granted by someone other than the installer. A blanket
+"all future updates from Postman" row never counts.
+
+| checker | held | failed |
+|---|---|---|
+| `hook.py verify` (user's grant log) | 7/7 | 0 |
+| `hook.py naive` (command vs trusted_hash) | 2/7 | 5: installer-written hash, no grant, changed after grant, installer-written grant, two hashes |
+
+I wrote these cases myself from the issue thread, so they show the check refuses the
+shapes I could think of, nothing more. Limit, same as the relay: the checker can't see who
+is able to write the grant log, and the `by` field is only as good as that.
+
 ## The fourth problem: linked is not carried
 
 `relation-2026-10-19/` scores a field-match checker on restatements, corrections, updates and same-date conflicts,

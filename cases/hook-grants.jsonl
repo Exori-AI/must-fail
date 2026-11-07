@@ -1,0 +1,6 @@
+{"hook_id": "user-lint", "sha256": "cac8c789438ef55bf7f6dbddb2d7c0d917415d333fb75976b52c3b0a3cadb0fe", "by": "user"}
+{"hook_id": "postman-start", "publisher": "Postman", "scope": "all future updates", "by": "user"}
+{"hook_id": "vendor-upd", "sha256": "5ee3c10bde5077d7b33062e3ecd51ca850a7e9bd34c50a2fcc8f546bfea59660", "by": "user"}
+{"hook_id": "self-granted", "sha256": "5ee3c10bde5077d7b33062e3ecd51ca850a7e9bd34c50a2fcc8f546bfea59660", "by": "postman-installer"}
+{"hook_id": "two-hashes", "sha256": "cac8c789438ef55bf7f6dbddb2d7c0d917415d333fb75976b52c3b0a3cadb0fe", "by": "user"}
+{"hook_id": "two-hashes", "sha256": "612118dfde1ae6d57b1838b4cc5c20efb8d640b1d67a935553eafea2b0ca7f14", "by": "user"}
