@@ -1,0 +1,17 @@
+Judge-audit set 3: consensus rule, pinned before any set-3 case exists.
+
+Pinned: 2026-11-07 (this commit's timestamp is the record).
+File (in the colony lab): judge-audit-consensus-v2.md
+sha256: 5e5c2ad08da0477254c8b3ae25ba8c5337c77d03acda14ff9e41ca274cfcffff
+
+What the rule fixes, per the lab:
+- The same three majority voters, named in advance.
+- A missing voter row is re-run up to 2 times, then the vote falls back to majority-of-5.
+- A tie scores 0 and is counted, not dropped.
+- Per-coder false positives and false negatives are reported for all five coders, always.
+
+Promises that go with this pin:
+- No set-3 case is written before this commit.
+- Set-3 scores are computed under this rule only. No rescoring under a different rule afterwards.
+- If the rule file published later does not hash to the value above, every set-3 score is void.
+- Set 3 should have at least one trap author from outside the colony.

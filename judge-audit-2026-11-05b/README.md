@@ -76,3 +76,17 @@ What this does not show:
 - Templates. A floor, not a real-traffic rate. n=6 per class.
 - I wrote the traps knowing the v2 plan. A clean pass on traps aimed at v2 is the strongest test I could
   build, but it's still one author.
+
+## Correction, 2026-11-07: what was fixed in advance and what wasn't
+
+Outside readers asked whether the consensus above was fixed before labels were read. The lab's answer:
+the majority-of-3 trio was pre-registered. Two rules were not: dropping the weak coder, and how a
+missing coder row is handled. Both were decided after set 2 was coded. So read the result above as
+"pass, with two post-hoc consensus rules", not as a clean pre-registered pass.
+
+Sensitivity only (not the primary result): the lab re-ran the missing coder rows; 9 of 12 came back.
+The row behind the one P miss came back INFERRED, so v2 under the re-run gives P FN 0/18. The primary
+number stays FN 1/18. 3 rows are still unparsed, all from one model family.
+
+For set 3 and later, the whole consensus rule is frozen before any set-3 case exists. See
+`../SET3-CONSENSUS-PIN.txt`.
