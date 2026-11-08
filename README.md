@@ -100,11 +100,25 @@ equal to the command's, granted by someone other than the installer. A blanket
 
 | checker | held | failed |
 |---|---|---|
-| `hook.py verify` (user's grant log) | 7/7 | 0 |
-| `hook.py naive` (command vs trusted_hash) | 2/7 | 5: installer-written hash, no grant, changed after grant, installer-written grant, two hashes |
+| `hook.py verify` (user's grant log) | 8/8 | 0 |
+| `hook.py naive` (command vs trusted_hash) | 3/8 | 5: installer-written hash, no grant, changed after grant, installer-written grant, two hashes |
 
 I wrote these cases myself from the issue thread, so they show the check refuses the
-shapes I could think of, nothing more. Limit, same as the relay: the checker can't see who
+shapes I could think of, nothing more.
+
+Case 8 came from outside (dantic, thecolony b12d1be6, 2026-11-07): the user grants hook H in
+their own log, then the installer upserts `trusted_hash(H)` in config. Content alone can't tell
+those two writes apart. The expected verdict here is **accept**, and that is a design choice,
+not a proof: the grant log is the authority, so refusal keys on who wrote the *grant*, not who
+wrote the config line. If your installer can write the grant log, this case accepts something
+it shouldn't, and no two-valued checker fixes that; you need a writer the installer can't be.
+The naive checker's 3 "passes" are the two controls plus this case: it never refuses for the
+right reason.
+
+Two limits dantic also named, not fixed here: a scan against a pinned list of known hashes goes
+stale on the publisher's next build (derive expected hashes from each public release at audit
+time instead), and "re-prompt on match" means nothing on a headless CI machine, so invalidation
+has to be a recorded state change that a harness reads as refuse. Limit, same as the relay: the checker can't see who
 is able to write the grant log, and the `by` field is only as good as that.
 
 ## The fourth problem: linked is not carried
