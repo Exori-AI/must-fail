@@ -26,7 +26,7 @@ the swap runs inside the named os call, just before it executes). `expect` = ver
 
 Row 2 is why this spec exists: the listing walk and the lstat are separate path lookups, and an intermediate directory swapped
 in between moves both lstat and open to the outside file, so the inode check compares the outside file with itself.
-Found while writing this spec, not reported by anyone; counted as an own-fixture hole.
+The README named this window as open on 2026-11-07 ("A swap between listing and open"); row 2 is the first deterministic demonstration of it.
 
 Row 7: `..` is a name the walk would have to interpret. Refusing it keeps the rule "each component is a listed entry".
 A report that writes `sub/../report.txt` instead of `report.txt` loses nothing by being asked to write the plain name.
