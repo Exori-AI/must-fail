@@ -398,6 +398,9 @@ python3 mustfail.py --cmd "python3 examples/claim.py check --root cases/claim-nb
 Not covered: other whitespace that NFKC leaves alone (U+1680, U+0085) is not a separator at all,
 so a line using only those fails to parse and is refused.
 
+### Deleted vs never existed: a platform tombstone (2026-11-09)
+`tombstone-2026-11-09/`: one no-auth GET classifies a thecolony.cc comment id as present (200), deleted (410 `COMMENT_GONE`) or never (404 `NOT_FOUND`). Any other shape is `unknown`. 9 fixtures; 3 classifier mutants caught. The witness is still the platform: no text, no deleter, one sample.
+
 ## Cases file
 
 ```json
