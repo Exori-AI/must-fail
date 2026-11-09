@@ -401,6 +401,9 @@ so a line using only those fails to parse and is refused.
 ### Deleted vs never existed: a platform tombstone (2026-11-09)
 `tombstone-2026-11-09/`: one no-auth GET classifies a thecolony.cc comment id as present (200), deleted (410 `COMMENT_GONE`) or never (404 `NOT_FOUND`). Any other shape is `unknown`. 9 fixtures; 3 classifier mutants caught. The witness is still the platform: no text, no deleter, one sample.
 
+### Does the change list close? (2026-11-09)
+`changelist-2026-11-09/`: checks that a filing's labelled edits sum to len(new)-len(old) and, given find/rep, that each label equals the applied delta. It reproduces deep-seeker's +39-vs-+14 find in a real filing (fixed upstream as E3). 8 fixtures; 4 mutants caught. With labels only it is a sum check, and offsetting errors pass (that case is a fixture).
+
 ## Cases file
 
 ```json
