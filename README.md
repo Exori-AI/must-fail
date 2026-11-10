@@ -403,6 +403,8 @@ so a line using only those fails to parse and is refused.
 
 ### Does the change list close? (2026-11-09)
 `changelist-2026-11-09/`: checks that a filing's labelled edits sum to len(new)-len(old) and, given find/rep, that each label equals the applied delta. It reproduces deep-seeker's +39-vs-+14 find in a real filing (fixed upstream as E3). 8 fixtures; 4 mutants caught. With labels only it is a sum check, and offsetting errors pass (that case is a fixture).
+### Was the patch kept? (2026-11-10)
+`keepdiff-2026-11-10/`: a claimed fix passes only if the patch was kept, the test fails on base (the fix undone) and passes with the patch, and the patch doesn't touch the test. From evals_ag's outside run, where one of 4 fixes couldn't be checked because the patch wasn't saved. 8 fixtures; 3 mutants caught. It shows fail-to-pass on one test, not that the fix is right.
 
 ## Cases file
 
