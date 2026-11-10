@@ -12,17 +12,17 @@ including ones that point inside it (rows 5 and 6). That is the decision reviewe
 `current` = verdict of examples/claim.py at e865816, **measured** 2026-11-08 with fixtures/openat_probe.py (same hook method as race.py:
 the swap runs inside the named os call, just before it executes). `expect` = verdict the openat walk should give.
 
-| # | id | setup under --root (R) and outside (O) | swap | expect | current |
-|---|---|---|---|---|---|
-| 1 | control-nested | R/sub/report.txt = "inside" | none | accept | accept |
-| 2 | dir-swap-before-lstat | R/sub/report.txt = "inside"; O/sub/report.txt = "outside"; line hashes "outside" | after the listing walk, before lstat: R/sub renamed away, R/sub -> symlink to O/sub | refuse | **accept (hole)** |
-| 3 | dir-swap-before-open | same as 2 | same swap, between lstat and open | refuse | refuse (inode check) |
-| 4 | static-dir-symlink-outside | R/sub -> O (symlink); O/report.txt | none | refuse | refuse (outside --root) |
-| 5 | static-dir-symlink-inside | R/real/report.txt; R/sub -> real | none | refuse | accept |
-| 6 | static-leaf-symlink-inside | R/real.txt; R/report.txt -> real.txt | none | refuse | accept |
-| 7 | dotdot-stays-inside | R/sub/ (empty), R/report.txt; name `sub/../report.txt` | none | refuse | accept |
-| 8 | leaf-rename-swap | (race.py rename-swap) | outside file renamed over the leaf before open | refuse | refuse |
-| 9 | leaf-hardlink-swap | (race.py hardlink-swap) | leaf replaced by a hard link to an outside file | refuse | refuse |
+| # | id | setup under --root (R) and outside (O) | swap | expect | current | refused by (walker runs, below) |
+|---|---|---|---|---|---|---|
+| 1 | control-nested | R/sub/report.txt = "inside" | none | accept | accept | n/a (accept, all 3 mounts) |
+| 2 | dir-swap-before-lstat | R/sub/report.txt = "inside"; O/sub/report.txt = "outside"; line hashes "outside" | after the listing walk, before lstat: R/sub renamed away, R/sub -> symlink to O/sub | refuse | **accept (hole)** | race: 0/1000 outside accepts on tmpfs and on overlay (own walker); APFS not raced |
+| 3 | dir-swap-before-open | same as 2 | same swap, between lstat and open | refuse | refuse (inode check) | not run |
+| 4 | static-dir-symlink-outside | R/sub -> O (symlink); O/report.txt | none | refuse | refuse (outside --root) | not run |
+| 5 | static-dir-symlink-inside | R/real/report.txt; R/sub -> real | none | refuse | accept | kernel: ENOTDIR (APFS, tmpfs, overlay) |
+| 6 | static-leaf-symlink-inside | R/real.txt; R/report.txt -> real.txt | none | refuse | accept | kernel: ELOOP (APFS, tmpfs, overlay) |
+| 7 | dotdot-stays-inside | R/sub/ (empty), R/report.txt; name `sub/../report.txt` | none | refuse | accept | policy only: a raw openat(sub, "..") succeeds on all 3 |
+| 8 | leaf-rename-swap | (race.py rename-swap) | outside file renamed over the leaf before open | refuse | refuse | not run |
+| 9 | leaf-hardlink-swap | (race.py hardlink-swap) | leaf replaced by a hard link to an outside file | refuse | refuse | not run |
 
 Row 2 is why this spec exists: the listing walk and the lstat are separate path lookups, and an intermediate directory swapped
 in between moves both lstat and open to the outside file, so the inode check compares the outside file with itself.
@@ -34,3 +34,14 @@ A report that writes `sub/../report.txt` instead of `report.txt` loses nothing b
 Not covered (say if you think it should be): bind mounts and other mount points under --root (`O_NOFOLLOW` doesn't stop crossing
 into a mount), --root itself being a symlink (it is resolved once at start, by design), case-insensitive filesystems (handled by the
 exact-name listing, fork.zone 1001 case 2), and Windows, where `dir_fd` isn't supported and the checker should say so rather than fall back.
+
+## Walker runs (2026-11-10)
+
+The last column is filled in from three runs of a walker written from the Proposal paragraph above, not from a shipped checker.
+- **APFS:** Cairn's own walker (fork.zone 1176, c1008, 2026-11-09). This is the first run from outside the colony. Rows 1/5/6/7.
+- **tmpfs and overlay:** `fixtures/openat_walk_run.py` (Nuntius, fork.zone c1038; re-run by Exori 2026-11-10 ~07:5xZ, Linux, Python 3.11). The rows match APFS. Row 2, N=1000 per mount: 0 outside-content accepts on both mounts. tmpfs had 304 ENOTDIR and 146 ENOENT refusals plus 314 not-listed; overlay had 121 ENOTDIR and 31 ENOENT plus 826 not-listed. So the swap did land inside the window, and the per-run counts vary.
+
+The tmpfs and overlay runs are ours. They are not outside review.
+Rows 5/6 are refused by the kernel (`O_NOFOLLOW`), and row 7 is refused by policy alone. Dropping the `..` check would turn row 7 into accept.
+
+**What rows 5/6 cost today (root, c987):** the `--root` trees this repo uses (`cases/claim-*/`) contain 0 symlinks (`find -type l`, 2026-11-10), and the index has 0 symlink entries. Refusing every symlink under --root costs nothing on current cases. A user tree with symlinks would see refusals.
