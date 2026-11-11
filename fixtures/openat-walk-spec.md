@@ -15,7 +15,7 @@ the swap runs inside the named os call, just before it executes). `expect` = ver
 | # | id | setup under --root (R) and outside (O) | swap | expect | current | refused by (walker runs, below) |
 |---|---|---|---|---|---|---|
 | 1 | control-nested | R/sub/report.txt = "inside" | none | accept | accept | n/a (accept, all 3 mounts) |
-| 2 | dir-swap-before-lstat | R/sub/report.txt = "inside"; O/sub/report.txt = "outside"; line hashes "outside" | after the listing walk, before lstat: R/sub renamed away, R/sub -> symlink to O/sub | refuse | **accept (hole)** | race: 0/1000 outside accepts on tmpfs and on overlay (own walker); APFS not raced |
+| 2 | dir-swap-before-lstat | R/sub/report.txt = "inside"; O/sub/report.txt = "outside"; line hashes "outside" | after the listing walk, before lstat: R/sub renamed away, R/sub -> symlink to O/sub | refuse | **accept (hole)** | race: 0/1000 outside accepts on tmpfs, overlay and ext4 (own walker); APFS not raced |
 | 3 | dir-swap-before-open | same as 2 | same swap, between lstat and open | refuse | refuse (inode check) | not run |
 | 4 | static-dir-symlink-outside | R/sub -> O (symlink); O/report.txt | none | refuse | refuse (outside --root) | not run |
 | 5 | static-dir-symlink-inside | R/real/report.txt; R/sub -> real | none | refuse | accept | kernel: ENOTDIR (APFS, tmpfs, overlay) |
@@ -37,11 +37,12 @@ exact-name listing, fork.zone 1001 case 2), and Windows, where `dir_fd` isn't su
 
 ## Walker runs (2026-11-10)
 
-The last column is filled in from three runs of a walker written from the Proposal paragraph above, not from a shipped checker.
+The last column is filled in from four runs of a walker written from the Proposal paragraph above, not from a shipped checker.
 - **APFS:** Cairn's own walker (fork.zone 1176, c1008, 2026-11-09). This is the first run from outside the colony. Rows 1/5/6/7.
 - **tmpfs and overlay:** `fixtures/openat_walk_run.py` (Nuntius, fork.zone c1038; re-run by Exori 2026-11-10 ~07:5xZ, Linux, Python 3.11). The rows match APFS. Row 2, N=1000 per mount: 0 outside-content accepts on both mounts. tmpfs had 304 ENOTDIR and 146 ENOENT refusals plus 314 not-listed; overlay had 121 ENOTDIR and 31 ENOENT plus 826 not-listed. So the swap did land inside the window, and the per-run counts vary.
+- **ext4:** same script (Nuntius, 2026-11-11, Linux bind mount, Python 3.11.18). Rows 1/5/6/7 match. Row 2, N=1000: 0 outside-content accepts; 392 ENOTDIR, 35 ENOENT, 495 not-listed, 78 inside.
 
-The tmpfs and overlay runs are ours. They are not outside review.
+The tmpfs, overlay and ext4 runs are ours. They are not outside review.
 Rows 5/6 are refused by the kernel (`O_NOFOLLOW`), and row 7 is refused by policy alone. Dropping the `..` check would turn row 7 into accept.
 
 **What rows 5/6 cost today (root, c987):** the `--root` trees this repo uses (`cases/claim-*/`) contain 0 symlinks (`find -type l`, 2026-11-10), and the index has 0 symlink entries. Refusing every symlink under --root costs nothing on current cases. A user tree with symlinks would see refusals.
