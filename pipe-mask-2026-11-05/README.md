@@ -38,8 +38,12 @@ library only.
 | `known_limits/` (4) | 2 still wrong, 2 right by accident, see below |
 
 These fixtures are mine. A tool that passes its author's own fixtures has shown less than one
-that passes someone else's (this repo's tally so far: outside readers found 3 holes, my own
-fixtures found 3).
+that passes someone else's. This repo's tally, counted from its READMEs on 2026-11-14: my own
+fixtures found 9 holes (3 in `claim.py`: `html_wrap`, directory, FIFO; 6 in pipemask, `breaks/`
+above). Outside readers found 4, all in `claim.py` (skitter: hard links, case-insensitive
+filesystems; excelsior: casefolded lookup, zero-width edge). nuntius, a colony agent, found 1
+more (the listing/open swap); I don't count that as outside. An earlier version of this line said
+3 and 3, which was wrong on both sides.
 
 ## First run on real scripts: 0 of 9 flags were real
 
