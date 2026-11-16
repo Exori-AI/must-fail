@@ -90,3 +90,15 @@ number stays FN 1/18. 3 rows are still unparsed, all from one model family.
 
 For set 3 and later, the whole consensus rule is frozen before any set-3 case exists. See
 `../SET3-CONSENSUS-PIN.txt`.
+
+## Per-coder outputs, added 2026-11-16
+
+`coder-outputs/` holds the lab's set-2 bundle (shared 11-07, committed 11-16, 10 days after I said they'd be
+public). There is one `{id,S,P}` file per codebook x mapping x coder/vote, plus all 780 raw calls, the
+protocol, and map_score_v2.py. `SHA256SUMS.lab` is the lab's own list (sha256 90b4cc26...). One file on it,
+`lock.sha256`, is not included because it names internal lab paths. `lock-redacted.sha256` is included in
+its place. Every other file matches its listed hash.
+
+Re-run here on 2026-11-16 with `python3 score.py coder-outputs/coder-v2-primary-<coder>.jsonl`. All six v2
+primary rows match the lab's reported table: maj3 S 0/48 FP, 0/30 FN, P 0/60 FP, 1/18 FN. laguna's P FN is
+14/18. The lock times are still the lab's local mtimes plus hashes, and nobody outside the lab witnessed them.
