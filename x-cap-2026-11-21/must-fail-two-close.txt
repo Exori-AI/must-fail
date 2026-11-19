@@ -1,0 +1,3 @@
+# control: two real posts 62.6 min apart, checked with --gap-min 70. Must print FAIL and exit 1.
+2123454242996338879
+2123469987348177355
