@@ -1,0 +1,83 @@
+flags zero-missing=False drop-top=False; n used = 22 of 25; dropped: [('ky_fkgmsO2U', 'no views days 3+'), ('pg9BTL0-srw', 'no views days 3+'), ('6Pv1jTyhC4w', 'no views days 3+')]
+PRE-REG raw day-2 views        (a) day-1 AVD%   r=-0.087 R2=0.008 CI95[0.000,0.085]
+PRE-REG raw day-2 views        (b) day3+ AVD%   r=+0.347 R2=0.121 CI95[0.001,0.481]
+PRE-REG raw day-2 views        R2(b)-R2(a) CI95[-0.048,+0.458]
+EXPLORATORY log1p day-2 views  (a) day-1 AVD%   r=-0.004 R2=0.000 CI95[0.000,0.095]
+EXPLORATORY log1p day-2 views  (b) day3+ AVD%   r=+0.237 R2=0.056 CI95[0.000,0.504]
+EXPLORATORY log1p day-2 views  R2(b)-R2(a) CI95[-0.061,+0.491]
+
+vid day1_views day1_pct day3+_pct day2_views
+cd_RlzCdUVc   123   38.5   66.7   684
+_3gim9LuC7Y    41   53.7   53.3    33
+JKMTQ6Cx_70    32   44.1   39.4    30
+36zejD8JcmA    35   19.1   53.7    29
+0gmcEQIRBoM     9   44.8    2.9    23
+iTzC5TrmIZs    28   36.1    0.0    22
+jVT_jJFwo6A     6   54.3    0.0    18
+oRRWWbLqn7Q    17   53.1    0.0    10
+bsEbpZ6fYR0     2   39.5   42.4    10
+IccvFLZVrnU     1  147.7    0.0     9
+CpkWDi03Nk8     4  106.1   43.5     6
+cWGLU8sdL80     4   21.6    0.0     5
+cc0KoobPbuU    23   72.2    0.0     4
+ZVoKJHBPTz4    16   36.8    0.0     3
+z1gvRtHCJpc     1    0.0    0.0     2
+fgK7kCyQHGc    28   60.6   16.6     2
+JrxeM1ba07A     5   57.8   94.9     1
+ChE1nzt5arM   102   32.9    0.0     1
+afYtJT7rwDw    10   37.4    3.5     1
+f5BWXeZcDCA    37   51.4   62.4     1
+VRmskHgIiFc     9   37.8   20.1     1
+aS5OlgNKQdc    21   46.4   18.2     1
+flags zero-missing=True drop-top=False; n used = 13 of 25; dropped: [('ChE1nzt5arM', 'no views days 3+'), ('ZVoKJHBPTz4', 'no views days 3+'), ('ky_fkgmsO2U', 'no views days 3+'), ('pg9BTL0-srw', 'no views days 3+'), ('cWGLU8sdL80', 'no views days 3+'), ('z1gvRtHCJpc', 'no day-1 views'), ('iTzC5TrmIZs', 'no views days 3+'), ('6Pv1jTyhC4w', 'no views days 3+'), ('oRRWWbLqn7Q', 'no views days 3+'), ('cc0KoobPbuU', 'no views days 3+'), ('IccvFLZVrnU', 'no views days 3+'), ('jVT_jJFwo6A', 'no views days 3+')]
+PRE-REG raw day-2 views        (a) day-1 AVD%   r=-0.174 R2=0.030 CI95[0.001,0.342]
+PRE-REG raw day-2 views        (b) day3+ AVD%   r=+0.293 R2=0.086 CI95[0.001,0.464]
+PRE-REG raw day-2 views        R2(b)-R2(a) CI95[-0.270,+0.400]
+EXPLORATORY log1p day-2 views  (a) day-1 AVD%   r=-0.218 R2=0.048 CI95[0.000,0.352]
+EXPLORATORY log1p day-2 views  (b) day3+ AVD%   r=+0.223 R2=0.050 CI95[0.000,0.649]
+EXPLORATORY log1p day-2 views  R2(b)-R2(a) CI95[-0.304,+0.605]
+
+vid day1_views day1_pct day3+_pct day2_views
+cd_RlzCdUVc   123   38.5   68.2   684
+_3gim9LuC7Y    41   53.7   53.3    33
+JKMTQ6Cx_70    32   44.1   41.9    30
+36zejD8JcmA    35   19.1   53.7    29
+0gmcEQIRBoM     9   44.8   11.7    23
+bsEbpZ6fYR0     2   39.5   42.4    10
+CpkWDi03Nk8     4  106.1   47.9     6
+fgK7kCyQHGc    28   60.6   49.7     2
+JrxeM1ba07A     5   57.8   94.9     1
+afYtJT7rwDw    10   37.4    3.5     1
+f5BWXeZcDCA    37   51.4   62.4     1
+VRmskHgIiFc     9   37.8   20.1     1
+aS5OlgNKQdc    21   46.4   18.2     1
+flags zero-missing=False drop-top=True; n used = 21 of 25; dropped: [('ky_fkgmsO2U', 'no views days 3+'), ('pg9BTL0-srw', 'no views days 3+'), ('6Pv1jTyhC4w', 'no views days 3+'), ('cd_RlzCdUVc', '--drop-top')]
+PRE-REG raw day-2 views        (a) day-1 AVD%   r=-0.059 R2=0.004 CI95[0.000,0.135]
+PRE-REG raw day-2 views        (b) day3+ AVD%   r=+0.154 R2=0.024 CI95[0.000,0.421]
+PRE-REG raw day-2 views        R2(b)-R2(a) CI95[-0.099,+0.404]
+EXPLORATORY log1p day-2 views  (a) day-1 AVD%   r=+0.074 R2=0.006 CI95[0.000,0.117]
+EXPLORATORY log1p day-2 views  (b) day3+ AVD%   r=+0.005 R2=0.000 CI95[0.000,0.308]
+EXPLORATORY log1p day-2 views  R2(b)-R2(a) CI95[-0.084,+0.289]
+
+vid day1_views day1_pct day3+_pct day2_views
+_3gim9LuC7Y    41   53.7   53.3    33
+JKMTQ6Cx_70    32   44.1   39.4    30
+36zejD8JcmA    35   19.1   53.7    29
+0gmcEQIRBoM     9   44.8    2.9    23
+iTzC5TrmIZs    28   36.1    0.0    22
+jVT_jJFwo6A     6   54.3    0.0    18
+oRRWWbLqn7Q    17   53.1    0.0    10
+bsEbpZ6fYR0     2   39.5   42.4    10
+IccvFLZVrnU     1  147.7    0.0     9
+CpkWDi03Nk8     4  106.1   43.5     6
+cWGLU8sdL80     4   21.6    0.0     5
+cc0KoobPbuU    23   72.2    0.0     4
+ZVoKJHBPTz4    16   36.8    0.0     3
+z1gvRtHCJpc     1    0.0    0.0     2
+fgK7kCyQHGc    28   60.6   16.6     2
+JrxeM1ba07A     5   57.8   94.9     1
+ChE1nzt5arM   102   32.9    0.0     1
+afYtJT7rwDw    10   37.4    3.5     1
+f5BWXeZcDCA    37   51.4   62.4     1
+VRmskHgIiFc     9   37.8   20.1     1
+aS5OlgNKQdc    21   46.4   18.2     1
