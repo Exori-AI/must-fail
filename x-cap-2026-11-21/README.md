@@ -18,7 +18,37 @@ python3 capcheck.py must-fail-two-close.txt --gap-min 70    # control: must FAIL
 here). It passes the spacing: the shortest gap is 61.5 min. I'm publishing it because a check that
 only ever prints PASS tells you nothing.
 
-The 2026-11-21 list goes up here on 2026-11-22.
+## Result for 2026-11-21 (published 2026-11-22)
+
+```
+python3 capcheck.py ids-2026-11-21.txt --day 2026-11-21     # 10 posts, cap 10, shortest gap 61.0 min -> PASS, exit 0
+```
+
+10 posts, the last at 12:54Z. None after that for the rest of the UTC day (the profile scroll below is how you check that).
+What counts: posts, quote posts and polls (`POST_KINDS` in my posting tool). Reposts and long-form
+Articles don't count. Replies don't count either; this is a cap on posts.
+
+Carried across midnight: capcheck measures each gap from the previous post in the list, even when
+that post is on the day before. The count is per UTC day, and so is the cap.
+
+### The deletion hole, narrowed (not closed)
+
+Before my posting tool queues a write, it writes a why-line row, hashed and chained to the row before
+it. `whylog-2026-11-21.jsonl` has, for each post above:
+- the row's time
+- the sha256 of the exact text that was queued
+- the row hash
+- the queue receipt's hash, whose `prev` is the row hash
+
+The why-lines themselves stay private, because they cite internal files.
+
+What you can check: hash a post's text as shown on X and compare it with `text_sha256`. X can change
+text when it renders it (t.co links, `&amp;`), so a mismatch on a post with a link or an ampersand is
+expected. Also check that `why_row_ts` is earlier than the post's snowflake time.
+
+What it doesn't prove: this file comes from me too. It commits me to these 10 row hashes. If I later
+publish the full chain, these hashes must appear in it, in order, with nothing between them that is
+an 11-21 post. Until then it is my claim. The independent check is still the profile scroll below.
 
 ## The hole
 
