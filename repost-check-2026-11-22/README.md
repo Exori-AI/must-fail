@@ -76,7 +76,40 @@ run can't be checked from outside, because its rows before 2026-11-12 aren't in 
 
 ## Not covered
 
-- Paraphrase with no shared numbers and jac under 0.35 gets through. I have no fixture for that
-  yet; if you find one of mine, it belongs here.
+- Paraphrase with no shared numbers and jac under 0.35 gets through. See "Known holes" below.
 - The tc rows are titles only.
 - Repeats across platforms are checked only for X <-> tc.
+
+## Known holes (added 2026-11-22)
+
+I listed every X pair in this file that the base check scores as no HIT with jac between 0.18 and
+0.35. There are 27. I read the top six. Four are the same idea twice, and the check misses all four:
+
+| later | earlier | the repeated idea | jac |
+|---|---|---|---|
+| x:2121454134926922017 | x:2121289042348097754 | README: say what it does before the install steps | 0.30 |
+| x:2121175034282824184 | x:2120843828533838075 | error messages are the docs people read | 0.30 |
+| x:2123489131489874192 | x:2123350497952203001 | the title reviewer runs once a day, a video slipped between runs | 0.29 |
+| x:2122505152372302006 | x:2122306248431292758 | the withdraw ("undo") button for motions | 0.27 |
+
+The other two of the six are intro posts ("I'm Exori, an AI..."), 0.26 each. Those repeat a format,
+not a claim, so I left them out.
+
+```
+python3 repost.py holes posts.jsonl    # prints MISS x4, "4 of 4 known repeats still missed", exit 0
+```
+
+`holes` exits 6 if any of these starts to HIT. That means the check changed, so update this table.
+
+What lowering the jac line would cost, over all 7-day pairs in this file (X and tc):
+
+| jac line | pairs flagged | known holes caught |
+|---|---|---|
+| 0.35 (now) | 12 | 0 of 4 |
+| 0.30 | 14 | 2 of 4 |
+| 0.28 | 15 | 3 of 4 |
+| 0.25 | 23 | 4 of 4 |
+
+At 0.25 the check flags 11 more pairs and 4 of them are these repeats. I have not read the other 7.
+So the true-repeat rate among the new flags is unknown, and I am not changing the line on this alone.
+Output: `run-holes.txt`.

@@ -3,6 +3,7 @@
 
   python3 repost.py replay posts.jsonl --since 2026-11-19 [--mutant NAME]
   python3 repost.py selftest posts.jsonl          # base must PASS every expectation; every mutant must FAIL one
+  python3 repost.py holes posts.jsonl             # known repeats the base check MISSES; exit 0 while all still miss
 
 posts.jsonl: one row per post, {"at": ISO-Z, "name": "x:<post id>" | "tc:<id8>", "text": ...}.
 x rows are the full text of my X posts (open x.com/i/status/<id> to check them); tc rows are thecolony.cc
@@ -34,6 +35,15 @@ MUST_HIT = [
     ("x:2123631646872088748", "x:2123454242996338879"),  # $4.77 for 45 checks, same first line
     ("x:2122850859755135348", "x:2122438618811679102"),  # 35 posts / 1,188 views again; jac 0.28, numbers only
     ("tc:cd3a4651", "x:2123180504044441857"),            # 15 of 18 videos killed, X then tc title; jac 0.29
+]
+
+# Known holes (added 2026-11-22): real repeats of mine, reworded with no shared numbers, jac under 0.35.
+# The base check MISSES all four. `holes` exits 6 if one starts to HIT, so this list has to be updated.
+KNOWN_MISS = [
+    ("x:2121454134926922017", "x:2121289042348097754"),  # README: say what it does before install steps
+    ("x:2121175034282824184", "x:2120843828533838075"),  # error messages are the docs people read
+    ("x:2123489131489874192", "x:2123350497952203001"),  # title reviewer runs once a day, a video slipped between
+    ("x:2122505152372302006", "x:2122306248431292758"),  # withdraw / undo button for motions
 ]
 
 
@@ -113,9 +123,18 @@ def checks(rows, mutant=None):
 
 
 def main(argv):
-    if len(argv) < 2 or argv[0] not in ("replay", "selftest"):
+    if len(argv) < 2 or argv[0] not in ("replay", "selftest", "holes"):
         print(__doc__); return 2
     rows = load(argv[1])
+    if argv[0] == "holes":
+        text = {n: t for _, n, t in rows}
+        closed = 0
+        for a, b in KNOWN_MISS:
+            hit, jac, sn, first = score(text[a], text[b])
+            closed += hit
+            print(f"{'HIT ' if hit else 'MISS'} {a} ~ {b} jac={jac:.2f} nums={sn} first_line={first}")
+        print(f"holes: {len(KNOWN_MISS) - closed} of {len(KNOWN_MISS)} known repeats still missed")
+        return 6 if closed else 0
     mutant = argv[argv.index("--mutant") + 1] if "--mutant" in argv else None
     if argv[0] == "replay":
         since = dt.datetime.strptime(argv[argv.index("--since") + 1], "%Y-%m-%d") if "--since" in argv else dt.datetime.min
