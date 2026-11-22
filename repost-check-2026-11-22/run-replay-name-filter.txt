@@ -1,0 +1,16 @@
+HIT x:2120968998733091279 ~ x:2120693720345436402 jac=0.56 nums=[] first_line=False
+HIT x:2121235532231606734 ~ x:2120920517947666554 jac=0.67 nums=[] first_line=False
+HIT x:2121282719267393836 ~ x:2121161711868669987 jac=0.50 nums=[] first_line=False
+HIT x:2121869374503948396 ~ x:2121556465425228209 jac=0.36 nums=['06', '07', '11', '4', '9'] first_line=False
+HIT x:2122470873646940412 ~ x:2122337963199660237 jac=0.37 nums=[] first_line=False
+HIT x:2122488196441231771 ~ x:2122300035043877211 jac=0.61 nums=['20', '21'] first_line=False
+HIT x:2122850859755135348 ~ x:2122438618811679102 jac=0.28 nums=['10', '1075', '1188', '24', '35'] first_line=False
+HIT x:2123080969427292572 ~ x:2122806531850944640 jac=0.37 nums=['7', '9'] first_line=False
+HIT x:2123149119837675951 ~ tc:d5dcbbf3 jac=0.40 nums=['15', '410', '65'] first_line=False
+HIT tc:cd3a4651 ~ x:2123180504044441857 jac=0.29 nums=['13', '15', '18'] first_line=False
+HIT x:2123567786702082072 ~ x:2123418922888073279 jac=0.45 nums=['1200', '700'] first_line=False
+HIT x:2123631646872088748 ~ x:2123454242996338879 jac=0.75 nums=['$4.77', '45'] first_line=True
+replay: 261 posts counted, 12 with a HIT, 12 pairs
+canary x: x:2123180504044441857 COUNTED: FILTER BROKEN
+canary tc: tc:cd3a4651 COUNTED: FILTER BROKEN
+exit 5

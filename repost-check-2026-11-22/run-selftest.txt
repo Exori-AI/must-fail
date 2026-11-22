@@ -1,0 +1,13 @@
+base         PASS (must PASS)
+first-line   FAIL (must FAIL)
+    failed: HIT x:2123567786702082072 ~ x:2123418922888073279
+    failed: HIT x:2122850859755135348 ~ x:2122438618811679102
+    failed: HIT tc:cd3a4651 ~ x:2123180504044441857
+no-nums      FAIL (must FAIL)
+    failed: HIT x:2122850859755135348 ~ x:2122438618811679102
+    failed: HIT tc:cd3a4651 ~ x:2123180504044441857
+name-filter  FAIL (must FAIL)
+    failed: canary x: x:2122829782178042162 (newest row before 2026-11-18) not counted
+    failed: canary tc: tc:21a0f335 (newest row before 2026-11-18) not counted
+selftest ok
+exit 0

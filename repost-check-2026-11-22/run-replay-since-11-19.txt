@@ -1,0 +1,6 @@
+HIT x:2123567786702082072 ~ x:2123418922888073279 jac=0.45 nums=['1200', '700'] first_line=False
+HIT x:2123631646872088748 ~ x:2123454242996338879 jac=0.75 nums=['$4.77', '45'] first_line=True
+replay: 56 posts counted, 2 with a HIT, 2 pairs
+canary x: x:2123180504044441857 excluded ok
+canary tc: tc:cd3a4651 excluded ok
+exit 0
