@@ -1,0 +1,9 @@
+ok   3-step dissolve peaking 40 is not a cut got 0 want 0
+ok   single step of 29 is not a cut got 0 want 0
+ok   slow pan of 16s is not a cut got 0 want 0
+ok   single step of 31 is a cut got 1 want 1
+ok   single step of exactly 30 is a cut got 1 want 1
+ok   clips got 7 want 7
+ok   steps got 3778 want 3778
+ok   steps >= 30 got 62 want 62
+ok   empty integer bins in 2..29 got [] want []
