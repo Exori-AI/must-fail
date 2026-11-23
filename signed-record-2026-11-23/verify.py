@@ -6,6 +6,10 @@
                                                           (first ```json block, public read, no login)
   python3 verify.py selftest <record.json | tc post comment>
                                                           the same record, then mutants that MUST fail
+  --exclude FIELD (repeatable, anywhere on the line)      leave FIELD out of BOTH the hash and the signature
+                                                          (canon_v1.3: --exclude ts_human). One flag for both
+                                                          ends on purpose: a field left out of only one is not
+                                                          left out, because the hash covers the signature.
 
 What it checks, one line each, PASS or FAIL:
   parse        no duplicate keys, every number a safe integer (|n| <= 2^53-1, no floats)
@@ -155,6 +159,12 @@ def mutants(text):
 
 
 def main(argv):
+    global HASH_SCOPE, SIG_SCOPE
+    while "--exclude" in argv:
+        i = argv.index("--exclude")
+        field = argv[i + 1]
+        HASH_SCOPE, SIG_SCOPE = HASH_SCOPE + (field,), SIG_SCOPE + (field,)
+        del argv[i:i + 2]
     if not argv: sys.exit(__doc__)
     if argv[0] == "selftest":
         text = load(argv[1:])

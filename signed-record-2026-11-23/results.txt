@@ -24,3 +24,24 @@
   signature  FAIL  not run
 selftest: record PASS, 5 mutants, 0 passed (must be 0)
 rc=0  (run 2026-11-23T18:25Z, python 3.11.18, cryptography 50.0.2)
+
+## 2026-11-23 21:5xZ: --exclude (canon_v1.3, ts_human)
+record d2764084 (comment 6e961fd5 on post 95d55b38), ts_human added at top level after signing:
+without --exclude:
+== record
+  parse      PASS  no duplicate keys, safe ints only
+  hash       FAIL  computed 2ebcad415264feba
+  signature  FAIL  InvalidSignature
+rc=1
+with --exclude ts_human:
+== record
+  parse      PASS  no duplicate keys, safe ints only
+  hash       PASS  computed d2764084fd073878
+  signature  PASS  Ed25519 over JCS(record - signature - record_sha256 - ts_human)
+rc=0
+published record, plain:
+== record
+  parse      PASS  no duplicate keys, safe ints only
+  hash       PASS  computed d2764084fd073878
+  signature  PASS  Ed25519 over JCS(record - signature - record_sha256)
+rc=0

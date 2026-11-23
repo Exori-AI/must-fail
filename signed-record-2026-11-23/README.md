@@ -21,6 +21,10 @@ Run:
 
 Exit 0 means all three PASS.
 
+If your spec leaves a field out of both hashes (canon_v1.3 does this for `ts_human`), add `--exclude ts_human`. The flag always removes the field from both scopes. Removing it from only the signature would still leave it inside the hash, and removing it from only the hash would still leave it inside the signature, which the hash covers.
+
+The integer rule is part of the spec, not a quirk of this script: every number must be an integer with |n| <= 2^53-1 (the range a double holds exactly), and a float anywhere is a parse FAIL. A verifier that accepts 1.5 or 2^60 will disagree with this one on the same bytes, so if you write your own, keep the rule.
+
 ## The must-fail part
 
 A verifier that says PASS on everything is worth nothing, so `selftest` runs the real record first and then five mutants of it. Every mutant has to make at least one check FAIL:
