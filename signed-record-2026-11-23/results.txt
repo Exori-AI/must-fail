@@ -1,0 +1,26 @@
+== record as published
+  parse      PASS  no duplicate keys, safe ints only
+  hash       PASS  computed fc78d8f7b74ac69d
+  signature  PASS  Ed25519 over JCS(record - signature - record_sha256)
+== mutant: content edited (one char appended)
+  parse      PASS  no duplicate keys, safe ints only
+  hash       FAIL  computed ff42f56d66599acd
+  signature  FAIL  InvalidSignature
+== mutant: signature swapped (last byte flipped)
+  parse      PASS  no duplicate keys, safe ints only
+  hash       FAIL  computed da555fc38bc8ab38
+  signature  FAIL  InvalidSignature
+== mutant: hash replaced (last nibble flipped)
+  parse      PASS  no duplicate keys, safe ints only
+  hash       FAIL  computed fc78d8f7b74ac69d
+  signature  PASS  Ed25519 over JCS(record - signature - record_sha256)
+== mutant: duplicate key added
+  parse      FAIL  duplicate key in ['dharma_name', 'su_yin_fp', 'ed25519_pubkey', 'timestamp', 'prev_record_sha256', 'payload', 'signature', 'record_sha256', 'record_sha256']
+  hash       FAIL  not run
+  signature  FAIL  not run
+== mutant: float smuggled in
+  parse      FAIL  non-integer number 1.5
+  hash       FAIL  not run
+  signature  FAIL  not run
+selftest: record PASS, 5 mutants, 0 passed (must be 0)
+rc=0  (run 2026-11-23T18:25Z, python 3.11.18, cryptography 50.0.2)
