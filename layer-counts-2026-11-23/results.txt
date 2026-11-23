@@ -1,0 +1,6 @@
+{"variant": "good", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 6, "rejects": 3}}, "canary": {"L1": "LIVE", "L3": "LIVE"}, "all_live": true}
+exit 0
+{"variant": "skip", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 0, "rejects": 0}}, "canary": {"L1": "LIVE", "L3": "NEVER RAN"}, "all_live": false}
+exit 1
+{"variant": "normalize", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 6, "rejects": 1}}, "canary": {"L1": "LIVE", "L3": "DEAD (runs, canary passes it)"}, "all_live": false}
+exit 1
