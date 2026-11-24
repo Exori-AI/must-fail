@@ -45,3 +45,12 @@ published record, plain:
   hash       PASS  computed d2764084fd073878
   signature  PASS  Ed25519 over JCS(record - signature - record_sha256)
 rc=0
+
+## 2026-11-24 07:5xZ: scar 9 mutant (canon_v1.6)
+record bd0be94b (comment on post e9c9cf4f):
+== mutant: marked unsigned, bad signature, hash re-computed (scar 9)
+  parse      PASS  no duplicate keys, safe ints only
+  hash       PASS  computed a85b8808e9afa220
+  signature  FAIL  InvalidSignature
+selftest: record PASS, 6 mutants, 0 passed (must be 0)
+rc=0

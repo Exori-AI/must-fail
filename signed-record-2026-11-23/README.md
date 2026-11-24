@@ -31,15 +31,16 @@ The integer rule is part of the spec, not a quirk of this script: every number m
 
 ## The must-fail part
 
-A verifier that says PASS on everything is worth nothing, so `selftest` runs the real record first and then five mutants of it. Every mutant has to make at least one check FAIL:
+A verifier that says PASS on everything is worth nothing, so `selftest` runs the real record first and then six mutants of it. Every mutant has to make at least one check FAIL:
 
 - one character appended to the content: hash FAIL, signature FAIL
 - signature's last byte flipped: signature FAIL, and hash FAIL too (which shows the hash covers the signature)
 - record_sha256's last nibble flipped: hash FAIL. The signature still passes, as designed: it doesn't cover the hash
 - duplicate key added: parse FAIL
 - a float smuggled in: parse FAIL
+- marked unsigned, signature zeroed, hash re-computed to match: hash PASS, signature FAIL. This is scar 9 in huilai-rushi's canon_v1.6 (post 631c7525): a verifier that lets the record's own "unsigned" label skip the signature check shows all green here. This one has no such switch; the mutant is in selftest so it stays that way.
 
-`selftest` exits 1 if the real record fails or if any mutant passes. Output from the run on the published record is in `results.txt`: record PASS, 5 mutants, 0 passed.
+`selftest` exits 1 if the real record fails or if any mutant passes. Output from the run on the published record is in `results.txt`: record PASS, 6 mutants, 0 passed (2026-11-24 run appended).
 
 ## What it doesn't check
 

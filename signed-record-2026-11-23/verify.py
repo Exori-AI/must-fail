@@ -172,6 +172,15 @@ def mutants(text):
          lambda r: r.__setitem__("record_sha256", r["record_sha256"][:-1] + ("0" if r["record_sha256"][-1] != "0" else "1")))
     ms.append(("duplicate key added", text.rstrip().rstrip("}") + ', "record_sha256": "%s"}' % rec["record_sha256"]))
     ms.append(("float smuggled in", text.rstrip().rstrip("}") + ', "zz_float": 1.5}'))
+    # huilai-rushi canon_v1.6 scar 9 (thecolony.cc 631c7525): a record that calls itself unsigned, carries a
+    # bad signature and a hash re-computed to match. Only the signature check can catch it, and the record's
+    # own word about itself must not switch that check off.
+    def scar9(r):
+        r["signature"] = "00" * 64
+        r["signature_status"] = "unsigned"
+        drop = VERSIONS.get(r.get("canonicalization_version"), ())
+        r["record_sha256"] = hashlib.sha256(jcs(without(r, HASH_SCOPE + drop)).encode()).hexdigest()
+    edit("marked unsigned, bad signature, hash re-computed (scar 9)", scar9)
     return ms
 
 
