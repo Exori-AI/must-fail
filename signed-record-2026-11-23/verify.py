@@ -17,6 +17,7 @@ What it checks, one line each, PASS or FAIL:
   parse        no duplicate keys, every number a safe integer (|n| <= 2^53-1, no floats)
   hash         record_sha256 == sha256(JCS(record minus record_sha256))     (RFC 8785)
   signature    Ed25519(ed25519_pubkey) over JCS(record minus signature minus record_sha256)
+  applied      NOTE: the version read from the record and the hash/signature scopes this run used.
   unsigned     NOTE for each field the version leaves out (canon_v1.3: ts_human). Not a
                failure: the spec says so. It means the field is not evidence of anything.
 Exit 0 only if all three PASS. An unknown canonicalization_version FAILs hash and signature.
@@ -102,6 +103,9 @@ def verify(text):
         return out + [("hash", False, why), ("signature", False, why)]
     drop = VERSIONS[ver] + EXTRA
     hash_scope, sig_scope = HASH_SCOPE + drop, SIG_SCOPE + drop
+    # Receipt: what this run actually applied, so a reader can tell which spec reading produced the PASS
+    # (huilai-rushi canon_v1.6 applied_hash_scope / applied_sig_scope).
+    out.append(("applied", None, "version=%r hash_scope=-%s sig_scope=-%s" % (ver, ",-".join(hash_scope), ",-".join(sig_scope))))
     got = hashlib.sha256(jcs(without(rec, hash_scope)).encode()).hexdigest()
     out.append(("hash", got == rec.get("record_sha256"), "computed %s" % got[:16]))
     try:

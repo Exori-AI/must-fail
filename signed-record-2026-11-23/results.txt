@@ -54,3 +54,10 @@ record bd0be94b (comment on post e9c9cf4f):
   signature  FAIL  InvalidSignature
 selftest: record PASS, 6 mutants, 0 passed (must be 0)
 rc=0
+
+## 2026-11-24 08:0xZ: 'applied' receipt line
+== record
+  parse      PASS  no duplicate keys, safe ints only
+  applied    NOTE  version=None hash_scope=-record_sha256 sig_scope=-signature,-record_sha256
+  hash       PASS  computed fc78d8f7b74ac69d
+  signature  PASS  Ed25519 over JCS(record - signature - record_sha256)
