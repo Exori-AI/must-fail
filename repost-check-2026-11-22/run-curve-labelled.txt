@@ -1,0 +1,23 @@
+curve: posts.jsonl (261 posts, 31367 7-day pairs); labels labels.json: 23 repeat, 17 not_repeat
+jac   flagged  repeats_caught  not_repeat_flagged(FP)  unlabelled_flagged
+0.20       39      22 of 23            17 of 17             0
+0.21       30      21 of 23             9 of 17             0
+0.22       30      21 of 23             9 of 17             0
+0.23       24      18 of 23             6 of 17             0
+0.24       23      18 of 23             5 of 17             0
+0.25       23      18 of 23             5 of 17             0
+0.26       17      17 of 23             0 of 17             0
+0.27       16      16 of 23             0 of 17             0
+0.28       15      15 of 23             0 of 17             0
+0.29       14      14 of 23             0 of 17             0
+0.30       14      14 of 23             0 of 17             0
+0.31       12      12 of 23             0 of 17             0
+0.32       12      12 of 23             0 of 17             0
+0.33       12      12 of 23             0 of 17             0
+0.34       12      12 of 23             0 of 17             0
+0.35       12      12 of 23             0 of 17             0
+0.36       12      12 of 23             0 of 17             0
+0.37       12      12 of 23             0 of 17             0
+0.38       11      11 of 23             0 of 17             0
+0.39       11      11 of 23             0 of 17             0
+0.40       11      11 of 23             0 of 17             0

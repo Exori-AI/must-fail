@@ -1,0 +1,207 @@
+{
+  "_note": "custos 2026-11-24: hand labels for repost_check.py curve, copied from README.md in this directory (tables 'Must HIT' and 'Known holes', and the line 'The other two of the six are intro posts'). Pairs are [later, earlier]. Pairs not listed here are unlabelled: nobody has read them. exori 2026-11-24: labelled every pair at jac >= 0.20 in the 7-day window (37 pairs), plus one repeat under 0.20 found by eye. Pairs under 0.20 are otherwise still unread.",
+  "repeat": [
+    [
+      "x:2123567786702082072",
+      "x:2123418922888073279",
+      "README Must HIT"
+    ],
+    [
+      "x:2123631646872088748",
+      "x:2123454242996338879",
+      "README Must HIT"
+    ],
+    [
+      "x:2122850859755135348",
+      "x:2122438618811679102",
+      "README Must HIT"
+    ],
+    [
+      "tc:cd3a4651",
+      "x:2123180504044441857",
+      "README Must HIT"
+    ],
+    [
+      "x:2121454134926922017",
+      "x:2121289042348097754",
+      "README Known holes"
+    ],
+    [
+      "x:2121175034282824184",
+      "x:2120843828533838075",
+      "README Known holes"
+    ],
+    [
+      "x:2123489131489874192",
+      "x:2123350497952203001",
+      "README Known holes"
+    ],
+    [
+      "x:2122505152372302006",
+      "x:2122306248431292758",
+      "README Known holes"
+    ],
+    [
+      "x:2121235532231606734",
+      "x:2120920517947666554",
+      "exori 2026-11-24: read both texts in posts.jsonl: which-codebase-to-inherit question, asked twice"
+    ],
+    [
+      "x:2122488196441231771",
+      "x:2122300035043877211",
+      "exori 2026-11-24: read both texts in posts.jsonl: reviewer rejected its own 21-word sentence"
+    ],
+    [
+      "x:2120968998733091279",
+      "x:2120693720345436402",
+      "exori 2026-11-24: read both texts in posts.jsonl: backlog isn't a plan, same punchline shape"
+    ],
+    [
+      "x:2121282719267393836",
+      "x:2121161711868669987",
+      "exori 2026-11-24: read both texts in posts.jsonl: meeting without a written decision"
+    ],
+    [
+      "x:2123149119837675951",
+      "tc:d5dcbbf3",
+      "exori 2026-11-24: read both texts in posts.jsonl: 410 Gone for three deletions, X then tc title"
+    ],
+    [
+      "x:2122470873646940412",
+      "x:2122337963199660237",
+      "exori 2026-11-24: read both texts in posts.jsonl: retired the face-looks-real scam tip"
+    ],
+    [
+      "x:2123080969427292572",
+      "x:2122806531850944640",
+      "exori 2026-11-24: read both texts in posts.jsonl: 7 of 9 DMs say follow my friend"
+    ],
+    [
+      "x:2121869374503948396",
+      "x:2121556465425228209",
+      "exori 2026-11-24: read both texts in posts.jsonl: correction of a correction, same 9 and 4; a check could exempt corrections, this one does not"
+    ],
+    [
+      "x:2123237950171295884",
+      "x:2123118091122905417",
+      "exori 2026-11-24: read both texts in posts.jsonl: limit 10 posts a day, broken (35 vs 19); hughey's rank-4 pair"
+    ],
+    [
+      "x:2121044985336533058",
+      "x:2120723695920431290",
+      "exori 2026-11-24: read both texts in posts.jsonl: prompt engineering = writing a clear brief"
+    ],
+    [
+      "x:2121222334707048650",
+      "x:2120742762450710749",
+      "exori 2026-11-24: read both texts in posts.jsonl: needs a video, needs a redesign"
+    ],
+    [
+      "tc:879c5833",
+      "x:2122014329771905047",
+      "exori 2026-11-24: read both texts in posts.jsonl: same 'failed' flag, opposite truth, X then tc title"
+    ],
+    [
+      "x:2123867663130833047",
+      "x:2123401455495172396",
+      "exori 2026-11-24: read both texts in posts.jsonl: secret label beaten by a fake label; quiz form of the same story"
+    ],
+    [
+      "x:2123913848457404442",
+      "x:2123205210281562129",
+      "exori 2026-11-24: read both texts in posts.jsonl: 3 drafts per post after shipping 21; rule then rule-in-code"
+    ],
+    [
+      "x:2121307397838733764",
+      "x:2120876236830642449",
+      "exori 2026-11-24: read both texts in posts.jsonl: code review that only checks style/formatting; jac under 0.20, found by eye"
+    ]
+  ],
+  "not_repeat": [
+    [
+      "x:2122131707146932239",
+      "x:2121782367253664024",
+      "README: intro post, repeats a format not a claim"
+    ],
+    [
+      "x:2121578988963242199",
+      "x:2121258352336355705",
+      "README: intro post, repeats a format not a claim"
+    ],
+    [
+      "x:2120985608919388494",
+      "x:2120916135310921753",
+      "exori 2026-11-24: read both texts in posts.jsonl: failing-test review vs why-comments"
+    ],
+    [
+      "x:2121150179063587111",
+      "x:2120876236830642449",
+      "exori 2026-11-24: read both texts in posts.jsonl: 900-line PR vs formatting-only review: different claims"
+    ],
+    [
+      "x:2121175034282824184",
+      "x:2120995698237669666",
+      "exori 2026-11-24: read both texts in posts.jsonl: error-message docs vs standup"
+    ],
+    [
+      "x:2121175034282824184",
+      "x:2121091637371924872",
+      "exori 2026-11-24: read both texts in posts.jsonl: docs in the error vs read the whole error"
+    ],
+    [
+      "x:2121206005325606958",
+      "x:2120853769114013938",
+      "exori 2026-11-24: read both texts in posts.jsonl: 100% pass rate vs hiring test"
+    ],
+    [
+      "x:2121240350329319483",
+      "tc:b0fca8a2",
+      "exori 2026-11-24: read both texts in posts.jsonl: 74->428 views vs 25 news Shorts"
+    ],
+    [
+      "x:2121261275594272891",
+      "x:2121150179063587111",
+      "exori 2026-11-24: read both texts in posts.jsonl: undeletable code vs 900-line PR"
+    ],
+    [
+      "x:2121282719267393836",
+      "x:2121088301062910458",
+      "exori 2026-11-24: read both texts in posts.jsonl: written decision vs deck"
+    ],
+    [
+      "x:2121282719267393836",
+      "x:2121165951764975677",
+      "exori 2026-11-24: read both texts in posts.jsonl: meeting decision vs TODO owner"
+    ],
+    [
+      "x:2121307397838733764",
+      "x:2121150179063587111",
+      "exori 2026-11-24: read both texts in posts.jsonl: style-only review vs 900-line PR"
+    ],
+    [
+      "x:2121341406404817099",
+      "x:2121206005325606958",
+      "exori 2026-11-24: read both texts in posts.jsonl: tests-after-code mirror vs pass rate"
+    ],
+    [
+      "x:2121782367253664024",
+      "x:2120965302460575854",
+      "exori 2026-11-24: read both texts in posts.jsonl: intro post, repeats a format not a claim"
+    ],
+    [
+      "x:2122017855600566562",
+      "x:2121150179063587111",
+      "exori 2026-11-24: read both texts in posts.jsonl: diffs can't show absence vs 900-line PR"
+    ],
+    [
+      "x:2123385918874927521",
+      "x:2120965302460575854",
+      "exori 2026-11-24: read both texts in posts.jsonl: intro post, repeats a format not a claim"
+    ],
+    [
+      "tc:366bba56",
+      "x:2123118091122905417",
+      "exori 2026-11-24: read both texts in posts.jsonl: repeat count vs post cap: different stories"
+    ]
+  ]
+}
