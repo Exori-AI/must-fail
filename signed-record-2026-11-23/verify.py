@@ -7,15 +7,19 @@
   python3 verify.py selftest <record.json | tc post comment>
                                                           the same record, then mutants that MUST fail
   --exclude FIELD (repeatable, anywhere on the line)      leave FIELD out of BOTH the hash and the signature
-                                                          (canon_v1.3: --exclude ts_human). One flag for both
-                                                          ends on purpose: a field left out of only one is not
-                                                          left out, because the hash covers the signature.
+                                                          for experiments only: the record's own
+                                                          canonicalization_version already picks its scope
+                                                          (VERSIONS table). One flag for both ends on purpose:
+                                                          a field left out of only one is not left out,
+                                                          because the hash covers the signature.
 
 What it checks, one line each, PASS or FAIL:
   parse        no duplicate keys, every number a safe integer (|n| <= 2^53-1, no floats)
   hash         record_sha256 == sha256(JCS(record minus record_sha256))     (RFC 8785)
   signature    Ed25519(ed25519_pubkey) over JCS(record minus signature minus record_sha256)
-Exit 0 only if all three PASS.
+  unsigned     NOTE for each field the version leaves out (canon_v1.3: ts_human). Not a
+               failure: the spec says so. It means the field is not evidence of anything.
+Exit 0 only if all three PASS. An unknown canonicalization_version FAILs hash and signature.
 
 The scopes are the ones the record's author confirmed (thecolony.cc, 2026-11-23): the
 signature covers the content, the hash covers content + signature. If your records sign a
@@ -27,6 +31,10 @@ import hashlib, json, re, sys, urllib.request
 
 HASH_SCOPE = ("record_sha256",)                 # fields left out before hashing
 SIG_SCOPE = ("signature", "record_sha256")      # fields left out before signing
+# Extra fields each canonicalization_version leaves out of BOTH hash and signature.
+# The record says its version; the reader doesn't choose. Unknown version = FAIL, not a guess.
+VERSIONS = {None: (), "canon_v1": (), "canon_v1.3": ("ts_human",)}
+EXTRA = ()                                       # --exclude, on top of the version's own list
 UA = "must-fail-verify/1.0 (+https://github.com/Exori-AI/must-fail)"
 
 
@@ -88,15 +96,24 @@ def verify(text):
     except Exception as e:
         return [("parse", False, str(e)), ("hash", False, "not run"), ("signature", False, "not run")]
     out = [("parse", True, "no duplicate keys, safe ints only")]
-    got = hashlib.sha256(jcs(without(rec, HASH_SCOPE)).encode()).hexdigest()
+    ver = rec.get("canonicalization_version")
+    if ver not in VERSIONS:
+        why = "unknown canonicalization_version %r: no scope table, not guessing" % ver
+        return out + [("hash", False, why), ("signature", False, why)]
+    drop = VERSIONS[ver] + EXTRA
+    hash_scope, sig_scope = HASH_SCOPE + drop, SIG_SCOPE + drop
+    got = hashlib.sha256(jcs(without(rec, hash_scope)).encode()).hexdigest()
     out.append(("hash", got == rec.get("record_sha256"), "computed %s" % got[:16]))
     try:
         from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
         pk = Ed25519PublicKey.from_public_bytes(bytes.fromhex(rec["ed25519_pubkey"]))
-        pk.verify(bytes.fromhex(rec["signature"]), jcs(without(rec, SIG_SCOPE)).encode())
-        out.append(("signature", True, "Ed25519 over JCS(record - %s)" % " - ".join(SIG_SCOPE)))
+        pk.verify(bytes.fromhex(rec["signature"]), jcs(without(rec, sig_scope)).encode())
+        out.append(("signature", True, "Ed25519 over JCS(record - %s)" % " - ".join(sig_scope)))
     except Exception as e:
         out.append(("signature", False, type(e).__name__ + (": " + str(e) if str(e) else "")))
+    for f in drop:
+        if f in rec:
+            out.append(("unsigned", None, "%s = %r is outside hash AND signature: anyone can rewrite it and every check still passes" % (f, rec[f])))
     return out
 
 
@@ -127,8 +144,8 @@ def load(args):
 def show(label, res):
     print("== %s" % label)
     for name, ok, detail in res:
-        print("  %-10s %s  %s" % (name, "PASS" if ok else "FAIL", detail))
-    return all(ok for _, ok, _ in res)
+        print("  %-10s %s  %s" % (name, {True: "PASS", False: "FAIL", None: "NOTE"}[ok], detail))
+    return all(ok is not False for _, ok, _ in res)
 
 
 def mutants(text):
@@ -159,11 +176,10 @@ def mutants(text):
 
 
 def main(argv):
-    global HASH_SCOPE, SIG_SCOPE
+    global EXTRA
     while "--exclude" in argv:
         i = argv.index("--exclude")
-        field = argv[i + 1]
-        HASH_SCOPE, SIG_SCOPE = HASH_SCOPE + (field,), SIG_SCOPE + (field,)
+        EXTRA += (argv[i + 1],)
         del argv[i:i + 2]
     if not argv: sys.exit(__doc__)
     if argv[0] == "selftest":

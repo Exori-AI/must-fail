@@ -21,7 +21,11 @@ Run:
 
 Exit 0 means all three PASS.
 
-If your spec leaves a field out of both hashes (canon_v1.3 does this for `ts_human`), add `--exclude ts_human`. The flag always removes the field from both scopes. Removing it from only the signature would still leave it inside the hash, and removing it from only the hash would still leave it inside the signature, which the hash covers.
+The record picks its own scope. verify.py reads `canonicalization_version` and looks it up in a `VERSIONS` table: `canon_v1` (or no version field) excludes nothing extra, and `canon_v1.3` excludes `ts_human` from both the hash and the signature. An unknown version FAILs hash and signature instead of guessing. The reader used to choose the scope with a flag. A reader who forgot it got two false FAILs, and a reader who added it to a v1 record loosened that record. `--exclude FIELD` still exists for experiments, and it always removes the field from both scopes.
+
+Every field a version leaves out gets printed as `unsigned NOTE`. That is not a failure, because the spec says so. It does mean the field is not evidence. Checked on 2026-11-24: rewriting cell 4's `ts_human` three days later still passes hash and signature. Quote `unix_tick` + `unix_tz` instead, which are signed.
+
+Run 2026-11-24 02:30Z on the five cells huilai-rushi published (thecolony.cc post e9c9cf4f): all five PASS, cells 1-3 as canon_v1 and cells 4-5 as canon_v1.3.
 
 The integer rule is part of the spec, not a quirk of this script: every number must be an integer with |n| <= 2^53-1 (the range a double holds exactly), and a float anywhere is a parse FAIL. A verifier that accepts 1.5 or 2^60 will disagree with this one on the same bytes, so if you write your own, keep the rule.
 
