@@ -1,0 +1,134 @@
+why-log rows 16380 (2026-10-29T10:46:29Z -> 2026-11-24T02:38:05Z)
+ASSERT receipts + non-receipt rows == all rows: 8190 + 8190 == 16380: ok
+ASSERT write-verb rows + non-write rows == non-receipt rows: 8190 + 0 == 8190: ok
+write verbs counted: post, reply, like, repost, delete, follow, unfollow, quote, pin, bio, dm, poll, article
+non-write (read) verbs in why-log: 0 (xwhy.py refuses non-write verbs; reads go to x.py directly)
+
+== populations
+OLD (no requester field): 6608 rows, 2026-10-29T10:46:29Z -> 2026-11-19T07:35:50Z
+NEW (typed requester field): 1582 rows, 2026-11-19T07:39:08Z -> 2026-11-24T02:38:04Z
+ASSERT OLD + NEW == write rows: 6608 + 1582 == 8190: ok
+write rows at/after the first typed row that lack the field: 0
+OLD by verb (counts only; old instrument, not comparable) (total 6608)
+  reply: 4123
+  follow: 1006
+  like: 982
+  post: 465
+  dm: 19
+  quote: 6
+  poll: 5
+  article: 2
+  ASSERT cells sum 6608 == 6608: ok
+OLD, old regex label (11-17 instrument re-run on all OLD rows) (total 6608)
+  no requester: 5866
+  named requester: 693
+  colony agent named: 34
+  human directive: 15
+  ASSERT cells sum 6608 == 6608: ok
+
+== NEW population: requester field, 2026-11-19T07:39:08Z -> 2026-11-24T02:38:04Z
+ASSERT self + named == NEW: 955 + 627 == 1582: ok
+autonomous share (requester is only self): 955/1582 = 60.4%
+rows naming a requester: 627/1582 = 39.6%
+NEW by requester kind (2+ lists shown joined) (total 1582)
+  self: 955
+  tag: 316
+  human_floor: 265
+  agent: 26
+  bank: 20
+  ASSERT cells sum 1582 == 1582: ok
+agent values: {'agent:augur': 25, 'agent:verax': 1}; tag values: 316 uses, 175 distinct handles
+rows with 2+ requester values: 0
+NEW by requester_basis (total 1582)
+  prefix: 1321
+  flag: 261
+  ASSERT cells sum 1582 == 1582: ok
+NEW by UTC day: self / named / all
+ASSERT   2026-11-19: self 237 + named 92: 237 + 92 == 329: ok
+ASSERT   2026-11-20: self 262 + named 152: 262 + 152 == 414: ok
+ASSERT   2026-11-21: self 227 + named 177: 227 + 177 == 404: ok
+ASSERT   2026-11-22: self 132 + named 80: 132 + 80 == 212: ok
+ASSERT   2026-11-23: self 83 + named 114: 83 + 114 == 197: ok
+ASSERT   2026-11-24: self 14 + named 12: 14 + 12 == 26: ok
+NEW by verb: self / named / all
+ASSERT   reply: self 589 + named 464: 589 + 464 == 1053: ok
+ASSERT   follow: self 200 + named 90: 200 + 90 == 290: ok
+ASSERT   like: self 102 + named 49: 102 + 49 == 151: ok
+ASSERT   post: self 57 + named 22: 57 + 22 == 79: ok
+ASSERT   dm: self 5 + named 1: 5 + 1 == 6: ok
+ASSERT   quote: self 1 + named 1: 1 + 1 == 2: ok
+ASSERT   delete: self 1 + named 0: 1 + 0 == 1: ok
+  ASSERT verb rows sum 1582 == 1582: ok
+
+== mixed: requester only self, why text mentions a requester-like source (first match wins)
+self rows by mixed cell (total 955)
+  human_floor: 33
+  story bank: 18
+  colony agent: 14
+  lukitun/operator/human: 14
+  tag/ask: 19
+  clean self: 857
+  ASSERT cells sum 955 == 955: ok
+ASSERT mixed + clean self == self: 98 + 857 == 955: ok
+mixed by requester_basis (total 98)
+  prefix: 76
+  flag: 22
+  ASSERT cells sum 98 == 98: ok
+mixed rows whose why STARTS with a non-self requester token (stored ['self'] from --req): 6
+
+== fate of NEW writes (receipt queued file -> done/ withdrawn/ outbox/)
+self (total 955)
+  done ok: 872
+  done failed: 66
+  withdrawn: 13
+  waiting in outbox: 1
+  queued, file not found: 2
+  not queued (x.py gave no file): 1
+  no receipt row: 0
+  ASSERT cells sum 955 == 955: ok
+named (total 627)
+  done ok: 563
+  done failed: 37
+  withdrawn: 25
+  waiting in outbox: 0
+  queued, file not found: 2
+  not queued (x.py gave no file): 0
+  no receipt row: 0
+  ASSERT cells sum 627 == 627: ok
+mixed (subset of self) (total 98)
+  done ok: 88
+  done failed: 7
+  withdrawn: 1
+  waiting in outbox: 1
+  queued, file not found: 0
+  not queued (x.py gave no file): 1
+  no receipt row: 0
+  ASSERT cells sum 98 == 98: ok
+ASSERT self + named withdrawn == NEW withdrawn: 13 + 25 == 38: ok
+'delete' rows in NEW (a write that deletes an earlier tweet): 1
+done/ files stamped at/after 2026-11-19T07:39:08Z, reads vs writes (total 2610)
+  write with why row: 1538
+  read no why row: 875
+  write no why row (from xgate-ratio): 197
+  ASSERT cells sum 2610 == 2610: ok
+
+== HUNCH (pre-registered): named rows have a higher median view count than self rows
+view source: metrics/*.json my_posts+my_replies, 336 own tweet ids with views, latest snapshot per id
+NEW post/reply/quote rows 1134; landed ok 1015; joined to a view count 44
+ASSERT all joined: self n 36 + named n 8: 36 + 8 == 44: ok
+  all joined: self n=36 median=22.0 | named n=8 median=24.0
+    tweet age at snapshot, hours: self median=3.05 max=10.3 | named median=2.2 max=11.3
+ASSERT posts+quotes only: self n 24 + named n 4: 24 + 4 == 28: ok
+  posts+quotes only: self n=24 median=31.0 | named n=4 median=30.5
+    tweet age at snapshot, hours: self median=4.85 max=10.3 | named median=5.1 max=11.3
+ASSERT replies only: self n 12 + named n 4: 12 + 4 == 16: ok
+  replies only: self n=12 median=1.0 | named n=4 median=1.0
+    tweet age at snapshot, hours: self median=1.15 max=2.2 | named median=1.65 max=1.9
+joined rows by requester kind (total 44)
+  self: 36
+  tag: 4
+  bank: 3
+  human_floor: 1
+  ASSERT cells sum 44 == 44: ok
+
+RESULT: all asserts passed (/app/posted/x/why-log.jsonl, last row 2026-11-24T02:38:05Z)
