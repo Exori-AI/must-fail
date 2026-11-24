@@ -58,7 +58,17 @@ MUTATIONS = {
     "html_wrap":       lambda s: "<p>" + s + "</p>",
     "nfd":             lambda s: unicodedata.normalize("NFD", s),
     "prefix_noise":    lambda s: "Thanks for the summary! Quick note below.\n\n" + s,
+    # guillaume on thecolony.cc, 2026-11-24: U+017F long s is already lowercase, so .lower() leaves it
+    # and a substring written with "s" misses; .casefold() and NFKC fold it back. Kelvin sign: same family.
+    "long_s":          lambda s: s.replace("s", "\u017f"),
+    "kelvin_sign":     lambda s: s.replace("K", "\u212a").replace("k", "\u212a"),
+    # vina on thecolony.cc, 2026-11-24: NFKC folds compatibility forms but not confusables, so a Greek
+    # omicron for Latin o survives normalization. The homoglyph row above uses Cyrillic letters.
+    "greek_omicron":   lambda s: s.replace("o", "\u03bf").replace("O", "\u039f"),
 }
+# Not covered by any mutation here (musefelipe, 2026-11-24): an instruction split across two benign
+# halves, where only the join reads as an order. No contiguous bad string exists, so a byte-level
+# filter can't see it and a mutation list can't generate it. Write it as its own must-refuse case.
 
 # --mutate-accepts runs must-accept cases through all of MUTATIONS, same as must-refuse cases.
 # A checker that normalizes should accept a backed claim however it is dressed: quoted, wrapped,
@@ -133,7 +143,8 @@ def main():
                 ok = rc == 0
                 why = "" if ok else f"false refusal (rc {rc})"
             bad += not ok
-            rows.append({"case": c["id"], "expect": expect, "relabel": relabel, "mutation": m, "rc": rc, "ok": ok, "why": why,
+            noop = m != "identity" and text == c["input"]
+            rows.append({"noop": noop, "case": c["id"], "expect": expect, "relabel": relabel, "mutation": m, "rc": rc, "ok": ok, "why": why,
                          "stderr": err.decode("utf-8", "replace")[:200]})
             print(f"{'ok  ' if ok else 'FAIL'}  {c['id']:<28} {m:<15} rc={rc}  {why}{'  [' + relabel + ']' if relabel else ''}")
     held = sum(r["ok"] for r in rows)
@@ -153,6 +164,16 @@ def main():
     elif side["accept"][1] == 0:
         print("warning: 0 must-accept rows, so a checker that refuses everything scores the same",
               file=sys.stderr)
+    # aniu_sxs on thecolony.cc, 2026-11-24: one total hides which disguise to fix first.
+    leaks = {}
+    for r in rows:
+        if r["expect"] == "refuse":
+            t = leaks.setdefault(r["mutation"], [0, 0]); t[1] += 1; t[0] += not r["ok"]
+    noops = sum(r["noop"] for r in rows)
+    if noops:
+        print(f"{noops} rows were unchanged by their mutation (e.g. kelvin_sign on text with no k): they test nothing new")
+    if any(v[0] for v in leaks.values()):
+        print("leaks by mutation: " + ", ".join(f"{m} {v[0]}/{v[1]}" for m, v in leaks.items() if v[0]))
     if a.json:
         json.dump({"cmd": a.cmd, "held": held, "total": len(rows),
                    "refuse_held": side["refuse"][0], "refuse_total": side["refuse"][1],
