@@ -80,6 +80,28 @@ def jcs(o):
     return "{" + ",".join(jcs(k) + ":" + jcs(o[k]) for k in keys) + "}"
 
 
+# Key-order fixture (huilai-rushi, canon_v1.8 must_fail_fixtures #18): U+FFFD vs U+10000.
+# Code-point order puts U+FFFD first; UTF-16 order puts U+10000 first (surrogate D800 < FFFD).
+# RFC 8785 sorts by UTF-16 code units. A verifier that sorts by code point passes every
+# BMP-only record and gets this one wrong, so the pair is pinned by digest.
+ORDER_FIXTURE = ({"\ufffd": 1, "\U00010000": 2},
+                 "2be8040fe3029f9de464f315235716337d3ef13fe83fe32a481281b77a32112c",   # UTF-16 order (correct)
+                 "f0516938af0496fd78add6d50dedd04c35489a25bf4a03160eadd54051ed8b86")   # code-point order (wrong)
+
+
+def order_fixture():
+    """True if jcs() sorts keys by UTF-16 code units, and the fixture really separates the two orders."""
+    obj, good, bad = ORDER_FIXTURE
+    got = hashlib.sha256(jcs(obj).encode()).hexdigest()
+    cp = "{" + ",".join(jcs(k) + ":" + jcs(obj[k]) for k in sorted(obj)) + "}"
+    separates = hashlib.sha256(cp.encode()).hexdigest() == bad
+    ok = got == good and separates
+    print("%s key-order fixture: jcs sha256 %s...; code-point order gives %s... (%s)" % (
+        "PASS" if ok else "FAIL", got[:12], hashlib.sha256(cp.encode()).hexdigest()[:12],
+        "fixture separates the orders" if separates else "fixture does NOT separate"))
+    return ok
+
+
 def without(rec, drop):
     return {k: v for k, v in rec.items() if k not in drop}
 
@@ -197,6 +219,7 @@ def main(argv):
     if not argv: sys.exit(__doc__)
     if argv[0] == "selftest":
         text = load(argv[1:])
+        order_ok = order_fixture()
         base = show("record as published", verify(text))
         dead = 0
         for label, t in mutants(text):
@@ -204,8 +227,9 @@ def main(argv):
             if ok:
                 dead += 1
                 print("  ^ this mutant PASSED: a check is dead")
-        print("selftest: record %s, %d mutants, %d passed (must be 0)" % ("PASS" if base else "FAIL", len(mutants(text)), dead))
-        return 0 if base and dead == 0 else 1
+        print("selftest: key-order fixture %s, record %s, %d mutants, %d passed (must be 0)" % (
+            "PASS" if order_ok else "FAIL", "PASS" if base else "FAIL", len(mutants(text)), dead))
+        return 0 if order_ok and base and dead == 0 else 1
     return 0 if show("record", verify(load(argv))) else 1
 
 

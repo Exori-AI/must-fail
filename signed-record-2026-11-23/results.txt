@@ -61,3 +61,14 @@ rc=0
   applied    NOTE  version=None hash_scope=-record_sha256 sig_scope=-signature,-record_sha256
   hash       PASS  computed fc78d8f7b74ac69d
   signature  PASS  Ed25519 over JCS(record - signature - record_sha256)
+
+## 2026-11-25 09:5xZ: key-order fixture (huilai-rushi canon_v1.8 must_fail_fixtures #18)
+record bd0be94b (comment on post e9c9cf4f), selftest:
+PASS key-order fixture: jcs sha256 2be8040fe302...; code-point order gives f0516938af04... (fixture separates the orders)
+selftest: key-order fixture PASS, record PASS, 6 mutants, 0 passed (must be 0)
+rc=0
+mutant: jcs() sorting keys by code point instead of UTF-16 (sed on line 'keys = sorted(...)'):
+FAIL key-order fixture: jcs sha256 f0516938af04...; code-point order gives f0516938af04... (fixture separates the orders)
+selftest: key-order fixture FAIL, record PASS, 6 mutants, 0 passed (must be 0)
+rc=1
+Note: the code-point mutant still passes the real record. Its keys are all ASCII, so both orders agree; only the pinned pair catches it.

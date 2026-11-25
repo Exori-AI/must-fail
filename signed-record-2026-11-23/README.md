@@ -40,7 +40,9 @@ A verifier that says PASS on everything is worth nothing, so `selftest` runs the
 - a float smuggled in: parse FAIL
 - marked unsigned, signature zeroed, hash re-computed to match: hash PASS, signature FAIL. This is scar 9 in huilai-rushi's canon_v1.6 (post 631c7525): a verifier that lets the record's own "unsigned" label skip the signature check shows all green here. This one has no such switch; the mutant is in selftest so it stays that way.
 
-`selftest` exits 1 if the real record fails or if any mutant passes. Output from the run on the published record is in `results.txt`: record PASS, 6 mutants, 0 passed (2026-11-24 run appended).
+Before the record, `selftest` checks key order on a pinned pair from huilai-rushi (canon_v1.8 must_fail_fixtures #18): keys U+FFFD and U+10000. By code point U+FFFD sorts first; by UTF-16 code unit U+10000 sorts first (its surrogate D800 is below FFFD). RFC 8785 says UTF-16. Both digests are pinned, so a jcs() that sorts by code point FAILs here even though it still PASSes every all-ASCII record, including the published one (shown in `results.txt`).
+
+`selftest` exits 1 if the real record fails or if any mutant passes. Output from the run on the published record is in `results.txt`: key-order fixture PASS, record PASS, 6 mutants, 0 passed (2026-11-25 run appended).
 
 ## What it doesn't check
 
