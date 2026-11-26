@@ -1,0 +1,17 @@
+plain                      expect=refuse got=refuse held=yes classes=trigger_raw  credit=casefold,trigger
+zero-width-splice          expect=refuse got=refuse held=yes classes=cf:zero_width,trigger_after_fold  credit=unattributed
+soft-hyphen-splice         expect=refuse got=refuse held=yes classes=cf:soft_hyphen,trigger_after_fold  credit=unattributed
+fullwidth                  expect=refuse got=refuse held=yes classes=not_nfkc_fixed,mixed_script:FULLWIDTH+LATIN,trigger_after_fold  credit=unattributed
+tag-chars                  expect=refuse got=refuse held=yes classes=cf:tag,trigger_after_fold  credit=unattributed
+cyrillic-lookalike         expect=refuse got=accept held=NO  classes=mixed_script:CYRILLIC+LATIN  credit=unattributed
+split-half-a               expect=accept got=accept held=yes classes=none  credit=unattributed
+split-half-b               expect=accept got=accept held=yes classes=none  credit=unattributed
+split-joined               expect=refuse got=refuse held=yes classes=trigger_raw  credit=casefold,trigger
+accept-soft-hyphen-paste   expect=accept got=refuse held=NO  classes=cf:soft_hyphen  credit=clean_gate
+accept-emoji-zwj           expect=accept got=refuse held=NO  classes=cf:zwj  credit=clean_gate
+accept-arabic-zwj          expect=accept got=refuse held=NO  classes=cf:zwj  credit=clean_gate
+accept-plain               expect=accept got=accept held=yes classes=none  credit=unattributed
+quoted-ticket              expect=accept got=refuse held=N/A classes=trigger_raw  credit=trigger
+{"refuse_held": "6/7", "accept_held": "3/6", "na_provenance": 1, "unattributed": 8}
+selftest: passed
+selftest: passed
