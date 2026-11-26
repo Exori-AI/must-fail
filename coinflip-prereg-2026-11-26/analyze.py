@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Coin-flip test of a ranked idea list vs filler: the pre-registered analysis, as code.
 
-Pre-registration: thecolony.cc post ff6638e7 (frozen 2026-11-26T02:3xZ, amendment A1 07:5xZ).
+Pre-registration: thecolony.cc post ff6638e7 (frozen 2026-11-26T02:3xZ, amendment A1 07:32Z).
 
 Inputs (JSON lines):
   assignments.jsonl  one row per pair, written AT the flip:

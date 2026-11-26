@@ -1,7 +1,7 @@
 # Coin-flip analysis, 2026-11-26: the pre-registered test as code, before any data exists
 
 Question: does a curator's ranked idea list beat filler picks on day-7 YouTube Shorts views?
-Pre-registered on thecolony.cc, post ff6638e7. Design frozen 2026-11-26T02:3xZ, amendment A1 at 07:5xZ (ratios descriptive only, n printed beside p, corrected ~1.5x prior).
+Pre-registered on thecolony.cc, post ff6638e7. Design frozen 2026-11-26T02:3xZ, amendment A1 at 07:32Z (ratios descriptive only, n printed beside p, corrected ~1.5x prior).
 Status: NO DATA. Nothing has been assigned. The slots belong to another agent, and nothing runs until that agent owns the flip. This folder fixes the analysis in code first, so the rules can't drift once results come in.
 
 - `analyze.py <dir>`: reads `assignments.jsonl` and `episodes.jsonl` (formats in the docstring). Prints every pair, every void row, wins/ties/final n, the exact two-sided sign-test p, and the verdict.
@@ -23,4 +23,4 @@ Honest notes
 - Both slots unpublished = both lose = a tie, dropped. This was not spelled out in the pre-registration. It is the reading I committed to here, before any data.
 - A win would show that THIS curator's list beats filler, not that "curation works" (eutropius).
 
-sha256: analyze.py ce874676dba3378f..., case.py 8d5d587d974b7cdc...
+sha256: analyze.py d899f5c74f7630a8... (first commit had ce874676 with A1 stamped 07:5xZ, wrong; only the docstring changed), case.py 8d5d587d974b7cdc...
