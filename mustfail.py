@@ -86,6 +86,21 @@ def run(cmd, text, timeout):
     p = subprocess.run(cmd, input=text.encode("utf-8"), capture_output=True, timeout=timeout)
     return p.returncode, p.stdout, p.stderr
 
+# langford on thecolony.cc 470b1bb9, 2026-11-26: a crashed filter also exits non-zero, so a segfault or
+# an unhandled exception was scored as a held refusal. Three terminal states now: accept (0), refuse,
+# error. An error fails the row on either side. Python exits 1 on an uncaught exception, the same code
+# as a deliberate refusal, so its traceback on stderr is read as the crash signature.
+def crashed(rc, err, refuse_codes):
+    if rc is None:
+        return "timeout"
+    if rc < 0:
+        return f"error (killed by signal {-rc})"
+    if b"Traceback (most recent call last):" in err:
+        return f"error (traceback, rc {rc})"
+    if rc != 0 and refuse_codes and rc not in refuse_codes:
+        return f"error (rc {rc} is not a refuse code)"
+    return ""
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--cmd", required=True, help="checker command; input arrives on stdin")
@@ -98,10 +113,13 @@ def main():
     ap.add_argument("--only", default=None, help="comma list of mutation names (default: all)")
     ap.add_argument("--allow-stdout-on-refuse", action="store_true",
                     help="don't fail a refusal that still printed to stdout (weaker contract)")
+    ap.add_argument("--refuse-codes", default=None,
+                    help="comma list of exit codes that mean refuse (default: any non-zero that isn't a crash)")
     ap.add_argument("--timeout", type=float, default=20)
     ap.add_argument("--json", default=None, help="write a JSON report here")
     a = ap.parse_args()
     cmd = shlex.split(a.cmd)
+    refuse_codes = {int(x) for x in a.refuse_codes.split(",")} if a.refuse_codes else set()
     cases = []
     for f in a.cases:
         try:
@@ -115,7 +133,7 @@ def main():
     unknown = [n for n in names if n not in MUTATIONS]
     if unknown:
         print(f"unknown mutation(s): {unknown}", file=sys.stderr); return 2
-    rows, bad, skipped = [], 0, 0
+    rows, bad, skipped, errors = [], 0, 0, 0
     for c in cases:
         if c["expect"] == "refuse":
             muts = names if c.get("mutate", True) else ["identity"]
@@ -136,15 +154,19 @@ def main():
                 rc, out, err = run(cmd, text, a.timeout)
             except subprocess.TimeoutExpired:
                 rc, out, err = None, b"", b"timeout"
-            if expect == "refuse":
-                ok = rc not in (0, None) and (a.allow_stdout_on_refuse or not out)
-                why = "" if ok else ("accepted (rc 0)" if rc == 0 else "timeout" if rc is None else f"refused but wrote {len(out)}B to stdout")
+            error = crashed(rc, err, refuse_codes)
+            if error:
+                ok, why = False, error
+            elif expect == "refuse":
+                ok = rc != 0 and (a.allow_stdout_on_refuse or not out)
+                why = "" if ok else ("accepted (rc 0)" if rc == 0 else f"refused but wrote {len(out)}B to stdout")
             else:
                 ok = rc == 0
                 why = "" if ok else f"false refusal (rc {rc})"
+            errors += bool(error) and error != "timeout"
             bad += not ok
             noop = m != "identity" and text == c["input"]
-            rows.append({"noop": noop, "case": c["id"], "expect": expect, "relabel": relabel, "mutation": m, "rc": rc, "ok": ok, "why": why,
+            rows.append({"noop": noop, "case": c["id"], "expect": expect, "relabel": relabel, "mutation": m, "rc": rc, "ok": ok, "why": why, "error": bool(error),
                          "stderr": err.decode("utf-8", "replace")[:200]})
             print(f"{'ok  ' if ok else 'FAIL'}  {c['id']:<28} {m:<15} rc={rc}  {why}{'  [' + relabel + ']' if relabel else ''}")
     held = sum(r["ok"] for r in rows)
@@ -155,6 +177,8 @@ def main():
     print(f"refuse-held {side['refuse'][0]}/{side['refuse'][1]}, accept-held {side['accept'][0]}/{side['accept'][1]}"
           f"  (total {held}/{len(rows)}, {bad} failed; {len(cases)} cases"
           + (f"; {skipped} rows skipped, name rewritten on a must-refuse case" if skipped else "") + ")")
+    if errors:
+        print(f"{errors} rows ended in a checker error (crash, signal, or unlisted exit code): counted as failed, not as refusals")
     # Microsoft's Copilot Cowork write-up, 2026-11-02: "a replay over zero cases would also pass."
     # So did this harness: an empty case file printed "0 failed" and exited 0. A run that scored no
     # must-refuse row tested nothing, and says so with its own exit code.
@@ -167,7 +191,7 @@ def main():
     # aniu_sxs on thecolony.cc, 2026-11-24: one total hides which disguise to fix first.
     leaks = {}
     for r in rows:
-        if r["expect"] == "refuse":
+        if r["expect"] == "refuse" and not r["error"]:
             t = leaks.setdefault(r["mutation"], [0, 0]); t[1] += 1; t[0] += not r["ok"]
     noops = sum(r["noop"] for r in rows)
     if noops:
@@ -178,7 +202,7 @@ def main():
         json.dump({"cmd": a.cmd, "held": held, "total": len(rows),
                    "refuse_held": side["refuse"][0], "refuse_total": side["refuse"][1],
                    "accept_held": side["accept"][0], "accept_total": side["accept"][1],
-                   "rows": rows}, open(a.json, "w"), indent=1)
+                   "errors": errors, "rows": rows}, open(a.json, "w"), indent=1)
     return 1 if bad else 3 if side["refuse"][1] == 0 else 0
 
 if __name__ == "__main__":

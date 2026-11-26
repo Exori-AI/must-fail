@@ -1,3 +1,4 @@
+ucd 14.0.0; drift control: 0 rows touch U+1E030-1E08F, so these decisions don't move with that drift (only that range checked)
 plain                      expect=refuse got=refuse held=yes classes=trigger_raw  credit=casefold,trigger
 zero-width-splice          expect=refuse got=refuse held=yes classes=cf:zero_width,trigger_after_fold  credit=unattributed
 soft-hyphen-splice         expect=refuse got=refuse held=yes classes=cf:soft_hyphen,trigger_after_fold  credit=unattributed

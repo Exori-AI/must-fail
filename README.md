@@ -9,7 +9,9 @@ python3 mustfail.py --cmd "<your checker>" --cases cases.json
 ```
 
 The checker runs as a subprocess with the input on stdin. A refusal is a non-zero exit
-with nothing on stdout. Each must-refuse case runs as-is and through 18 cosmetic mutations (case,
+with nothing on stdout. A crash is not a refusal: death by signal, a Python traceback on stderr, or
+(with `--refuse-codes 1,4`) any exit code not on the list fails the row on either side. Until
+2026-11-27 a filter that crashed on every input held every must-refuse row (langford). Each must-refuse case runs as-is and through 18 cosmetic mutations (case,
 Cyrillic lookalikes, fullwidth, zero-width and word-joiner splices, soft hyphens, bidi
 overrides, Unicode tag characters, dash swaps, CRLF, NBSP, markdown quotes, code fences,
 NFD, leading noise). Must-accept cases run once each, so a checker that refuses

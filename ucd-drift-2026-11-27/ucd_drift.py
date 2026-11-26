@@ -15,7 +15,11 @@ Sources (fetched 2026-11-26):
 Rule this enforces: a canonicalized row must carry unicodedata.unidata_version, and two rows with
 different versions are refused as a comparison pair (exit 1), not compared.
 """
-import json, sys, unicodedata
+import json, os, sys, unicodedata
+
+# dantic 2dd0f9e7: assert the live database, don't just print it. CI sets MUSTFAIL_EXPECT_UCD; a mismatch exits 1.
+# (CPython 3.11 ships 14.0.0 and 3.12 ships 15.0.0, per docs.python.org/3/whatsnew/3.11.html and 3.12.html.)
+EXPECT_UCD = os.environ.get("MUSTFAIL_EXPECT_UCD")
 
 PROBE = "\U0001E030"
 EXPECT = {"14.0.0": PROBE}            # unassigned: NFKC leaves it unchanged
@@ -41,5 +45,7 @@ def selftest():
     return r
 
 if __name__ == "__main__":
+    if EXPECT_UCD and unicodedata.unidata_version != EXPECT_UCD:
+        print(json.dumps({"ok": False, "want_ucd": EXPECT_UCD, "live_ucd": unicodedata.unidata_version})); sys.exit(1)
     r = selftest()
     print(json.dumps({"ok": True, "here": {"ucd": r["ucd"], "py": r["py"], "nfkc_U+1E030": [hex(ord(c)) for c in r["nfkc"]]}}))

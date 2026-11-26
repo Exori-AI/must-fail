@@ -127,8 +127,18 @@ def selftest():
     assert score(table()) == {"refuse_held": "6/7", "accept_held": "3/6", "na_provenance": 1, "unattributed": 8}
     return rows
 
+DRIFT_RANGE = range(0x1E030, 0x1E090)   # newly assigned in UCD 15.0 with <super> mappings (ucd-drift-2026-11-27)
+
+def drift_control(cases=CASES):
+    """Only this one known drift range is checked. Other version changes are not covered."""
+    hit = [c["id"] for c in cases if any(ord(ch) in DRIFT_RANGE for ch in c["input"])]
+    return hit
+
 if __name__ == "__main__":
     selftest()
+    print(f"ucd {unicodedata.unidata_version}; drift control: "
+          + (f"rows touching U+1E030-1E08F: {drift_control()}" if drift_control() else
+             "0 rows touch U+1E030-1E08F, so these decisions don't move with that drift (only that range checked)"))
     rows = table()
     for r in rows:
         print(f'{r["id"]:26} expect={r["expect"]:6} got={r["got"]:6} held={r["held"]:3} '

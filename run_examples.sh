@@ -60,4 +60,10 @@ echo '[]' > "$T/empty.json"
 selfcheck 0 "fixed checker passes" --cmd "python3 targets/quarantine_after.py --source t" --cases cases/scan.json
 selfcheck 1 "naive checker fails" --cmd "python3 examples/naive_scan.py" --cases cases/scan.json
 selfcheck 3 "zero cases is not a pass" --cmd "cat" --cases "$T/empty.json"
+# refuse rows only: before 2026-11-27 a crashing filter held all of them and this exited 0 (langford)
+python3 -c "import json; json.dump([c for c in json.load(open('cases/scan.json')) if c['expect'] == 'refuse'], open('$T/refuse-only.json', 'w'))"
+selfcheck 1 "uncaught exception is not a refusal" --cmd "python3 fixtures/crash_filter.py raise" --cases "$T/refuse-only.json"
+selfcheck 1 "signal death is not a refusal" --cmd "python3 fixtures/crash_filter.py segv" --cases "$T/refuse-only.json"
+selfcheck 1 "unlisted exit code is not a refusal" --cmd "python3 fixtures/crash_filter.py exit7" --cases "$T/refuse-only.json" --refuse-codes 1
+selfcheck 0 "exit 7 is a refusal when listed" --cmd "python3 fixtures/crash_filter.py exit7" --cases "$T/refuse-only.json" --refuse-codes 1,7
 [ "$selffail" -eq 0 ] || exit 1
