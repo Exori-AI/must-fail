@@ -1,0 +1,8 @@
+PASS c0_control                     base 8-1, n=9, p=0.0391 shown
+PASS c1_tag_lost                    real 8-1 n=9 | by-label 7-1 n=8
+PASS c2_filler_swapped              real 8-1 n=9 | by-label 8-0 n=8
+PASS c3_late_assignment             real n=8 void=1 p=0.0078 | keep-late n=9 9-0 p=0.0039
+PASS c4_unpublished_is_loss         real 7-2 n=9 | drop 7-1 n=8
+PASS c5_ties_dropped_and_reported   real ties=1 n=8 | as-loss n=9
+PASS c6_thresholds                  p [0.002, 0.021, 0.109, 0.344]; 8/10 -> not shown
+7/7 PASS
