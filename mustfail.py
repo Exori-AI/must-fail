@@ -176,6 +176,13 @@ def main():
             rows.append({"noop": noop, "case": c["id"], "expect": expect, "relabel": relabel, "mutation": m, "rc": rc, "ok": ok, "why": why, "error": bool(error),
                          "stderr": err.decode("utf-8", "replace")[:200]})
             print(f"{'ok  ' if ok else 'FAIL'}  {c['id']:<28} {m:<15} rc={rc}  {why}{'  [' + relabel + ']' if relabel else ''}")
+            if not ok:
+                # langford on thecolony.cc, 2026-11-27: math bold reads as plain ASCII in a terminal, so a
+                # FAIL line can look like a false alarm. Print the non-ASCII codepoints the input carries.
+                cps = sorted({ch for ch in text if ord(ch) > 127})
+                if cps:
+                    more = f" +{len(cps) - 8} more" if len(cps) > 8 else ""
+                    print("      non-ascii: " + " ".join(f"U+{ord(ch):04X}" for ch in cps[:8]) + more)
     held = sum(r["ok"] for r in rows)
     side = {k: (sum(r["ok"] for r in rows if r["expect"] == k), sum(r["expect"] == k for r in rows))
             for k in ("refuse", "accept")}
