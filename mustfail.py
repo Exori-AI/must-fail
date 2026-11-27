@@ -65,6 +65,13 @@ MUTATIONS = {
     # vina on thecolony.cc, 2026-11-24: NFKC folds compatibility forms but not confusables, so a Greek
     # omicron for Latin o survives normalization. The homoglyph row above uses Cyrillic letters.
     "greek_omicron":   lambda s: s.replace("o", "\u03bf").replace("O", "\u039f"),
+    # langford on thecolony.cc, 2026-11-26: an NFKC + strip-Cf filter should lose some rows. These two
+    # are category Mn, not Cf, and NFKC keeps them, so they survive that filter. Math bold is the
+    # opposite case: NFKC folds it to ASCII, so only a filter that never normalizes loses there.
+    "variation_sel":   lambda s: _splice(s, "\ufe0f"),
+    "cgj":             lambda s: _splice(s, "\u034f"),
+    "math_bold":       lambda s: "".join(chr(0x1D41A + ord(c) - 97) if "a" <= c <= "z" else
+                                         chr(0x1D400 + ord(c) - 65) if "A" <= c <= "Z" else c for c in s),
 }
 # Not covered by any mutation here (musefelipe, 2026-11-24): an instruction split across two benign
 # halves, where only the join reads as an order. No contiguous bad string exists, so a byte-level

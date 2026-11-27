@@ -11,10 +11,11 @@ python3 mustfail.py --cmd "<your checker>" --cases cases.json
 The checker runs as a subprocess with the input on stdin. A refusal is a non-zero exit
 with nothing on stdout. A crash is not a refusal: death by signal, a Python traceback on stderr, or
 (with `--refuse-codes 1,4`) any exit code not on the list fails the row on either side. Until
-2026-11-27 a filter that crashed on every input held every must-refuse row (langford). Each must-refuse case runs as-is and through 18 cosmetic mutations (case,
+2026-11-27 a filter that crashed on every input held every must-refuse row (langford). Each must-refuse case runs as-is and through 24 cosmetic mutations (case,
 Cyrillic lookalikes, fullwidth, zero-width and word-joiner splices, soft hyphens, bidi
 overrides, Unicode tag characters, dash swaps, CRLF, NBSP, markdown quotes, code fences,
-NFD, leading noise). Must-accept cases run once each, so a checker that refuses
+NFD, leading noise, long s, Kelvin sign, Greek omicron, variation selectors, combining grapheme
+joiner, math bold). Must-accept cases run once each, so a checker that refuses
 everything fails too. Standard library only.
 
 Exit codes: 0 every row held, 1 at least one row failed, 2 bad arguments or case file, 3 nothing
@@ -68,13 +69,13 @@ python3 mustfail.py --cmd "python3 my_filter.py" --cases my_cases.json
 The files are in `examples/quickstart/`. That toy filter is a lowercase substring match, and it prints:
 
 ```
-refuse-all baseline: refuse-held 44/44, accept-held 0/2
-refuse-held 24/44, accept-held 1/2  (total 25/46, 21 failed; 4 cases)
+refuse-all baseline: refuse-held 50/50, accept-held 0/2
+refuse-held 24/50, accept-held 1/2  (total 25/52, 27 failed; 4 cases)
 7 rows were unchanged by their mutation (e.g. kelvin_sign on text with no k): they test nothing new
-leaks by mutation: homoglyph 2/2, fullwidth 2/2, zero_width 2/2, word_joiner 2/2, soft_hyphen 2/2, bidi_override 2/2, tag_chars 2/2, nbsp 2/2, long_s 2/2, greek_omicron 2/2
+leaks by mutation: homoglyph 2/2, fullwidth 2/2, zero_width 2/2, word_joiner 2/2, soft_hyphen 2/2, bidi_override 2/2, tag_chars 2/2, nbsp 2/2, long_s 2/2, greek_omicron 2/2, variation_sel 2/2, cgj 2/2, math_bold 2/2
 ```
 
-It catches both attacks as written, and 20 of the 42 disguised versions get through. It also refuses
+It catches both attacks as written, and 26 of the 48 disguised versions get through. It also refuses
 the support ticket that only quotes the phrase. Each `FAIL` line names the case and the mutation, so
 you can paste that input straight into your own tests. Exit code 1 means at least one row failed. Use
 it in CI as is.
@@ -82,12 +83,16 @@ it in CI as is.
 The usual first fix is `my_filter_nfkc.py`: NFKC, casefold, drop format characters. It prints:
 
 ```
-refuse-held 40/44, accept-held 1/2  (total 41/46, 5 failed; 4 cases)
-leaks by mutation: homoglyph 2/2, greek_omicron 2/2
+refuse-held 42/50, accept-held 1/2  (total 43/52, 9 failed; 4 cases)
+leaks by mutation: homoglyph 2/2, greek_omicron 2/2, variation_sel 2/2, cgj 2/2
 ```
 
-Normalization closed 8 of the 10 leaking classes. It does not fold lookalike letters (Cyrillic о, Greek ο
-for Latin o), because those are separate characters, not compatibility forms. And it still refuses the
+Normalization closed 9 of the 13 leaking classes. It does not fold lookalike letters (Cyrillic о, Greek ο
+for Latin o), because those are separate characters, not compatibility forms. Two of the misses are
+invisible: variation selectors (U+FE0F) and the combining grapheme joiner (U+034F) are category Mn,
+not Cf, so "drop format characters" keeps them and NFKC does too. Drop the Unicode
+Default_Ignorable_Code_Point set instead (`_ignorable` in `examples/fence.py`). Our own quarantine
+tool had this hole until 2026-11-27 (langford asked for mutations this filter loses; these found it). And it still refuses the
 quoted support ticket: no amount of normalization tells quoting from ordering. That second failure is
 why the must-accept half matters.
 

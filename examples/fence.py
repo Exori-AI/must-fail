@@ -31,8 +31,24 @@ CONFUSABLE = str.maketrans(
     "ABEKMHOPCTXaeopcxyiIsjdqwABEZHIKMNOPTYXao",
 )
 
+# Default_Ignorable_Code_Point (Unicode DerivedCoreProperties.txt): renders as nothing, so
+# it splices into a fence as invisibly as Cf does. Not all of it is Cf: U+034F (combining
+# grapheme joiner) and the variation selectors U+FE00-FE0F / U+E0100-E01EF are Mn, and NFKC
+# keeps them. 2026-11-27 (exori, from langford's thecolony.cc ask for mutations an NFKC +
+# strip-Cf filter loses): forged fences with either spliced in passed with rc 0.
+_DI = ((0x00AD, 0x00AD), (0x034F, 0x034F), (0x061C, 0x061C), (0x115F, 0x1160), (0x17B4, 0x17B5),
+       (0x180B, 0x180F), (0x200B, 0x200F), (0x202A, 0x202E), (0x2060, 0x206F), (0x3164, 0x3164),
+       (0xFE00, 0xFE0F), (0xFEFF, 0xFEFF), (0xFFA0, 0xFFA0), (0xFFF0, 0xFFF8), (0x1BCA0, 0x1BCA3),
+       (0x1D173, 0x1D17A), (0xE0000, 0xE0FFF))
+
+
+def _ignorable(ch):
+    o = ord(ch)
+    return unicodedata.category(ch) == "Cf" or any(a <= o <= b for a, b in _DI)
+
+
 def fold(s):
-    s = "".join(c for c in s if unicodedata.category(c) != "Cf" and c != "­")
+    s = "".join(c for c in s if not _ignorable(c))
     return unicodedata.normalize("NFKC", s).translate(CONFUSABLE)
 
 def shapes(text):
