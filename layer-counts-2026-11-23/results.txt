@@ -4,3 +4,5 @@ exit 0
 exit 1
 {"variant": "normalize", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 6, "rejects": 1}}, "canary": {"L1": "LIVE", "L3": "DEAD (runs, canary passes it)"}, "all_live": false}
 exit 1
+{"variant": "unheard", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 6, "rejects": 3}}, "canary": {"L1": "LIVE", "L3": "FIRED-UNHEARD (refusal in log only, status: OK 0)"}, "all_live": false}
+exit 1
