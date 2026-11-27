@@ -16,6 +16,11 @@ Record fields (all required unless marked):
   tolerance {metric, op, value, set_at} set_at must be BEFORE read_at: the bar is written before the read
   measured {metric: value}              must contain tolerance.metric
   verdict                               "pass"/"fail"; must equal the recomputed one, never trusted as written
+  segment {basis, source}               optional. If basis is "subtitle_cue", source {file, revision, sha256}
+                                        is required: another cue file gives other segment starts, so another number
+  absent [field, ...]                   optional: downloader-reported fields that came back empty. Each must be
+                                        null in the record, never filled with a default
+(11-27 later: segment source + absent added, both from dantic 78a85652.)
 The fixtures below are synthetic. No real channel data.
 """
 import json, sys
@@ -36,6 +41,12 @@ def problems(r):
         if not r.get("format_id"): p.append("served copy needs format_id")
         d = r.get("downloader") or {}
         if not (d.get("name") and d.get("version")): p.append("served copy needs downloader name+version")
+    seg = r.get("segment")
+    if seg and seg.get("basis") == "subtitle_cue":
+        src = seg.get("source") or {}
+        if not all(src.get(k) for k in ("file", "revision", "sha256")): p.append("cue segment needs source file+revision+sha256")
+    for f in r.get("absent", []):
+        if r.get(f) is not None: p.append(f"{f} listed absent but has a value")
     tol = r["tolerance"]
     if ts(tol["set_at"]) >= ts(r["read_at"]): p.append("tolerance set at/after the read")
     if abs((ts(r["read_at"]) - ts(r["upload_at"])).total_seconds() - r["age_s"]) > 1: p.append("age_s inconsistent")
@@ -79,6 +90,14 @@ def selftest():
     assert len(problems(nod)) == 2
     # must-fail: age that doesn't match the timestamps
     assert "age_s inconsistent" in problems(dict(SERVED, age_s=3600))
+    # must-fail: cue-based segments with no pinned cue file
+    cue = dict(SERVED, segment={"basis": "subtitle_cue", "source": {"file": "toy.en.vtt", "revision": "r1"}})
+    assert "cue segment needs source file+revision+sha256" in problems(cue)
+    assert problems(dict(cue, segment={"basis": "subtitle_cue",
+                                       "source": {"file": "toy.en.vtt", "revision": "r1", "sha256": "1" * 64}})) == []
+    # must-fail: a field the downloader left empty, then filled with a default
+    assert "format_note listed absent but has a value" in problems(dict(SERVED, absent=["format_note"], format_note="unknown"))
+    assert problems(dict(SERVED, absent=["format_note"], format_note=None)) == []
     # an invalid record makes the artifact fail even if every valid row passes
     _, art = summary([MASTER, dict(SERVED, measured={"lufs_delta": 0.5}, verdict="pass", format_id="")])
     assert art == {"toy-001": "fail"}
