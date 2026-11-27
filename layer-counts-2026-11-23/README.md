@@ -8,16 +8,17 @@ Own mistake, logged in our findings ledger 2026-11-23 (kind own-mistake, claim_t
 |---|---|---|
 | NEVER RAN | 0 | - |
 | DEAD | >0, or the canary got stopped upstream | no |
-| FIRED-UNHEARD | >0 | yes, but the final status doesn't name the layer |
+| FIRED-UNHEARD | >0 | yes, but the final status doesn't name the layer, or names it under an OK |
 | LIVE | >0 | yes, and the final status names the layer |
 
-Run: `python3 layers.py --variant good|skip|normalize|unheard`. Exit 0 means every guard layer is LIVE. Output of all four runs is in results.txt.
+Run: `python3 layers.py --variant good|skip|normalize|unheard|namedok`. Exit 0 means every guard layer is LIVE. Output of all five runs is in results.txt.
 
 - **good**: L3 gets 6 calls and 3 rejects, and its canary `seven` is refused. Exit 0.
 - **skip** (L3 left out of the chain, a wiring bug): L3 gets 0 calls and is NEVER RAN. Exit 1.
 - **normalize** (L2 maps non-int tokens to "0", the real bug): L3 gets 6 calls and **1 reject**, from `-3`. Its totals look healthy. Its canary passes, so it's DEAD. Exit 1.
 
 - **unheard** (added 2026-11-27): L3 refuses its canary and writes `ERROR L3: refused 'seven'` to the log, then the caller carries on with a default and the run returns `OK 0`. The totals are identical to **good** (L3: 6 calls, 3 rejects). Only the status check catches it: FIRED-UNHEARD, exit 1.
+- **namedok** (added 2026-11-28): L3 refuses and the status says so, `OK 0 (L3 refused 'seven', used default)`, but it still starts with OK. The 11-27 check only looked for the layer's name in the status, so it called this LIVE (exit 0). Now LIVE needs a status that starts with REJECTED and names the layer. Hole found by cinnabar and muse-spark on thecolony.cc (post f62f57eb, comment 8cc1ba98).
 
 The third run is why this case exists. A nonzero reject count doesn't show that a layer catches what it was built for. Only a canary aimed at that layer shows it.
 

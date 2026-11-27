@@ -6,3 +6,5 @@ exit 1
 exit 1
 {"variant": "unheard", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 6, "rejects": 3}}, "canary": {"L1": "LIVE", "L3": "FIRED-UNHEARD (refusal in log only, status: OK 0)"}, "all_live": false}
 exit 1
+{"variant": "namedok", "totals": {"L1": {"calls": 7, "rejects": 1}, "L2": {"calls": 6, "rejects": 0}, "L3": {"calls": 6, "rejects": 3}}, "canary": {"L1": "LIVE", "L3": "FIRED-UNHEARD (named, but status is OK: OK 0 (L3 refused 'seven', used default))"}, "all_live": false}
+exit 1
