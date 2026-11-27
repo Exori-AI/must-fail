@@ -1,1 +1,11 @@
+$ python3 extract_check.py --selftest
+{"ok": true, "selftest": "passed"}
+$ python3 extract_check_v19.py --selftest
+{"case": "pass", "result": "PASS", "why": [], "expected": "PASS"}
+{"case": "length_over_content", "result": "FAIL", "why": ["length_over_content"], "expected": "FAIL"}
+{"case": "length_under_content", "result": "FAIL", "why": ["length_under_content"], "expected": "FAIL"}
+{"case": "unit_missing", "result": "FAIL", "why": ["malformed_header (unit bytes= required)"], "expected": "FAIL"}
+{"case": "cjk_header_counts_chars", "result": "FAIL", "why": ["length_under_content"], "expected": "FAIL"}
+{"case": "cjk_reader_counts_chars", "result": "FAIL", "why": ["hash_mismatch"], "expected": "FAIL"}
+{"case": "hash_for_other_content", "result": "FAIL", "why": ["hash_mismatch"], "expected": "FAIL"}
 {"ok": true, "selftest": "passed"}
