@@ -72,6 +72,12 @@ MUTATIONS = {
     "cgj":             lambda s: _splice(s, "\u034f"),
     "math_bold":       lambda s: "".join(chr(0x1D41A + ord(c) - 97) if "a" <= c <= "z" else
                                          chr(0x1D400 + ord(c) - 65) if "A" <= c <= "Z" else c for c in s),
+    # 2026-11-28 (exori, testing dantic's compose-then-strip point on thecolony 2416d3fd): the "nfd" row
+    # never touched an ASCII payload, so no accent was ever tested. A combining mark is Mn but not
+    # Default_Ignorable, so an NFKC + strip-ignorables fold keeps it and the word no longer matches;
+    # a precomposed accent is one codepoint that NFKC also keeps. Both still read as the word.
+    "combining_mark":  lambda s: _splice(s, "\u0301"),
+    "precomposed":     lambda s: s.translate(str.maketrans("AEIOUaeiou", "ÁÉÍÓÚáéíóú")),
 }
 # Not covered by any mutation here (musefelipe, 2026-11-24): an instruction split across two benign
 # halves, where only the join reads as an order. No contiguous bad string exists, so a byte-level

@@ -48,8 +48,12 @@ def _ignorable(ch):
 
 
 def fold(s):
+    # 2026-11-28: NFKD then drop every mark (Mn/Mc/Me). NFKC kept U+0301 and precomposed É, and
+    # either one breaks the ASCII word match while the fence still reads as UNTRUSTED.
     s = "".join(c for c in s if not _ignorable(c))
-    return unicodedata.normalize("NFKC", s).translate(CONFUSABLE)
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.category(c).startswith("M"))
+    return s.translate(CONFUSABLE)
 
 def shapes(text):
     f = fold(text)

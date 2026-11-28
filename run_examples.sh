@@ -26,11 +26,12 @@ python3 mustfail.py --cmd "python3 examples/fence.py scan" --cases cases/scan.js
 echo "== verify (issuance log) =="
 python3 mustfail.py --cmd "python3 examples/fence.py verify --log $LOG" --cases "$T/verify.json" --json "$T/verify-report.json" || true
 
-echo "== a real tool: quarantine.py before the 2026-10-16 fix, after it, and after 2026-11-27 (default-ignorables) =="
+echo "== a real tool: quarantine.py before the 2026-10-16 fix, after it, and after 2026-11-27 (default-ignorables), after 2026-11-28 (marks) =="
 export QUARANTINE_FENCE_LOG="$T/q-issued.jsonl"
 python3 mustfail.py --cmd "python3 targets/quarantine_before.py --source t" --cases cases/scan.json | tail -1 || true
 python3 mustfail.py --cmd "python3 targets/quarantine_after.py --source t" --cases cases/scan.json | tail -1 || true
 python3 mustfail.py --cmd "python3 targets/quarantine_1127.py --source t" --cases cases/scan.json | tail -1 || true
+python3 mustfail.py --cmd "python3 targets/quarantine_1128.py --source t" --cases cases/scan.json | tail -1 || true
 echo "== the naive substring check, for contrast =="
 python3 mustfail.py --cmd "python3 examples/naive_scan.py" --cases cases/scan.json | tail -1 || true
 echo "reports in $T"
@@ -58,7 +59,7 @@ selfcheck() {  # want, label, args...
 }
 selffail=0
 echo '[]' > "$T/empty.json"
-selfcheck 0 "fixed checker passes" --cmd "python3 targets/quarantine_1127.py --source t" --cases cases/scan.json
+selfcheck 0 "fixed checker passes" --cmd "python3 targets/quarantine_1128.py --source t" --cases cases/scan.json
 # the 10-16 fix stripped Cf only; U+FE0F and U+034F are Mn and pass it (2026-11-27)
 selfcheck 1 "Cf-only fold leaks on variation selectors" --cmd "python3 targets/quarantine_after.py --source t" --cases cases/scan.json --only variation_sel,cgj
 selfcheck 1 "naive checker fails" --cmd "python3 examples/naive_scan.py" --cases cases/scan.json

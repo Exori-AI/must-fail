@@ -65,8 +65,8 @@ def _ignorable(ch):
 
 
 def normalize(s):
-    s = unicodedata.normalize("NFKC", s)
-    s = "".join(c for c in s if not _ignorable(c))  # Cf + Mn default-ignorables (variation selectors, CGJ)
+    s = unicodedata.normalize("NFKD", s)  # 2026-11-28: NFKD + drop all marks, so "vérified" folds to "verified"
+    s = "".join(c for c in s if not _ignorable(c) and not unicodedata.category(c).startswith("M"))
     return s.translate(FOLD).casefold()
 
 def normalize_mapped(raw):

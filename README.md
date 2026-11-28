@@ -69,13 +69,13 @@ python3 mustfail.py --cmd "python3 my_filter.py" --cases my_cases.json
 The files are in `examples/quickstart/`. That toy filter is a lowercase substring match, and it prints:
 
 ```
-refuse-all baseline: refuse-held 50/50, accept-held 0/2
-refuse-held 24/50, accept-held 1/2  (total 25/52, 27 failed; 4 cases)
+refuse-all baseline: refuse-held 54/54, accept-held 0/2
+refuse-held 24/54, accept-held 1/2  (total 25/56, 31 failed; 4 cases)
 7 rows were unchanged by their mutation (e.g. kelvin_sign on text with no k): they test nothing new
-leaks by mutation: homoglyph 2/2, fullwidth 2/2, zero_width 2/2, word_joiner 2/2, soft_hyphen 2/2, bidi_override 2/2, tag_chars 2/2, nbsp 2/2, long_s 2/2, greek_omicron 2/2, variation_sel 2/2, cgj 2/2, math_bold 2/2
+leaks by mutation: homoglyph 2/2, fullwidth 2/2, zero_width 2/2, word_joiner 2/2, soft_hyphen 2/2, bidi_override 2/2, tag_chars 2/2, nbsp 2/2, long_s 2/2, greek_omicron 2/2, variation_sel 2/2, cgj 2/2, math_bold 2/2, combining_mark 2/2, precomposed 2/2
 ```
 
-It catches both attacks as written, and 26 of the 48 disguised versions get through. It also refuses
+It catches both attacks as written, and 30 of the 52 disguised versions get through. It also refuses
 the support ticket that only quotes the phrase. Each `FAIL` line names the case and the mutation, so
 you can paste that input straight into your own tests. Exit code 1 means at least one row failed. Use
 it in CI as is.
@@ -83,16 +83,19 @@ it in CI as is.
 The usual first fix is `my_filter_nfkc.py`: NFKC, casefold, drop format characters. It prints:
 
 ```
-refuse-held 42/50, accept-held 1/2  (total 43/52, 9 failed; 4 cases)
-leaks by mutation: homoglyph 2/2, greek_omicron 2/2, variation_sel 2/2, cgj 2/2
+leaks by mutation: homoglyph 2/2, greek_omicron 2/2, variation_sel 2/2, cgj 2/2, combining_mark 2/2, precomposed 2/2
 ```
 
-Normalization closed 9 of the 13 leaking classes. It does not fold lookalike letters (Cyrillic о, Greek ο
+Normalization closed 9 of the 15 leaking classes. It does not fold lookalike letters (Cyrillic о, Greek ο
 for Latin o), because those are separate characters, not compatibility forms. Two of the misses are
 invisible: variation selectors (U+FE0F) and the combining grapheme joiner (U+034F) are category Mn,
 not Cf, so "drop format characters" keeps them and NFKC does too. Drop the Unicode
 Default_Ignorable_Code_Point set instead (`_ignorable` in `examples/fence.py`). Our own quarantine
-tool had this hole until 2026-11-27 (langford asked for mutations this filter loses; these found it). And it still refuses the
+tool had this hole until 2026-11-27 (langford asked for mutations this filter loses; these found it). Two more are accents: NFKC keeps a combining acute (U+0301) and a precomposed É, and
+either one breaks a word match on text that still reads as the word. Use NFKD and drop every mark
+(category M) before matching. Our quarantine tool, `fence.py` and `claim.py` all had this hole until
+2026-11-28; the old `nfd` mutation never put an accent on an ASCII payload, so it never tested it
+(dantic's compose-then-strip question on thecolony prompted the test). And it still refuses the
 quoted support ticket: no amount of normalization tells quoting from ordering. That second failure is
 why the must-accept half matters.
 
