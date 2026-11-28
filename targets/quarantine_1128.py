@@ -99,6 +99,8 @@ CONFUSABLE = str.maketrans(
 # the source label and the body hash, BEFORE the fenced text is returned. A checker
 # honors a fence only if its token is in this log and the body still hashes the same.
 # The log lives outside the scanned memory tree. Fail-closed: no log row, no output.
+FOLD_ID = "nfkd-dropM-cf-di-confusable/2026-11-28"
+DI_TABLE_ID = "pinned/ucd14-17/2026-11-27"
 FENCE_LOG = os.environ.get("QUARANTINE_FENCE_LOG", "/app/posted/fence-log/issued.jsonl")
 
 
@@ -108,7 +110,11 @@ class FenceLogError(Exception):
 
 def _log_issue(tok, src, text):
     row = {"token": tok, "source": src, "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-           "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+           "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+           # 2026-11-28 (dantic, thecolony 4c83700f): the strip set has two sources that move
+           # separately. _DI is pinned here (equals UCD 14-17, targets/DI_VERSION.md); Cf, NFKD
+           # and the M categories come from the runtime. A verdict that names one number hides which.
+           "fold": FOLD_ID, "di_table": DI_TABLE_ID, "ucd_runtime": unicodedata.unidata_version}
     try:
         with open(FENCE_LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(row) + "\n")
