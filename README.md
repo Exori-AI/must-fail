@@ -45,8 +45,20 @@ if is_blocked(text):
 print(text, end="")
 ```
 
-If it is an HTTP service, a shell line can do it (a shape to adapt, not tested against any real API):
-`--cmd "sh -c 'curl -s -X POST --data-binary @- http://localhost:8000/check | grep -q BLOCK && exit 1 || exit 0'"`.
+If it is an HTTP service, use `examples/http_filter.py` (standard library only). It POSTs the text and
+reads one field of the JSON answer:
+
+```
+python3 mustfail.py --refuse-codes 1 --cases my_cases.json \
+  --cmd "python3 examples/http_filter.py --url http://localhost:8000/check --json-key text --field flagged"
+```
+
+Truthy field = refuse (exit 1), falsy = accept (exit 0). A dead service, an HTTP error, a non-JSON
+answer or a missing field exits 3, and with `--refuse-codes 1` that is an error that fails the row.
+An earlier version of this README suggested a `curl | grep` line instead. That line exits 0 when the
+service is down, so an outage read as "accepted everything". `tests/http_filter_selftest.py` shows
+both, against a local toy service. Tested against that toy only, not against any real vendor API.
+Keys: `--header-env "Authorization=MY_KEY_VAR"` reads the value from the environment.
 
 **2. Write the inputs it must refuse, and a few it must accept.** Use your own: real attacks you
 have seen, or the ones your filter's docs say it stops.

@@ -67,6 +67,9 @@ rc=0; python3 tests/marker_fixed_point.py quarantine_1128 > "$T/mfp.out" 2>&1 ||
 if [ "$rc" -eq 0 ]; then echo "ok    emitted markers are fold fixed points rc=0"; else echo "FAIL  emitted markers moved under fold rc=$rc"; selffail=1; fi
 rc=0; python3 tests/marker_fixed_point.py quarantine_1127 > "$T/mfp.out" 2>&1 || rc=$?
 if [ "$rc" -eq 1 ]; then echo "ok    11-27 labels were not fixed points rc=1"; else echo "FAIL  11-27 label check rc=$rc want 1"; selffail=1; fi
+# an HTTP filter that is down must be an error, not "accepted everything" (exori, 2026-11-28)
+rc=0; python3 tests/http_filter_selftest.py > "$T/http.out" 2>&1 || rc=$?
+if [ "$rc" -eq 0 ]; then echo "ok    http_filter: down/missing field are errors rc=0"; else echo "FAIL  http_filter selftest rc=$rc"; cat "$T/http.out"; selffail=1; fi
 selfcheck 1 "naive checker fails" --cmd "python3 examples/naive_scan.py" --cases cases/scan.json
 selfcheck 3 "zero cases is not a pass" --cmd "cat" --cases "$T/empty.json"
 # refuse rows only: before 2026-11-27 a crashing filter held all of them and this exited 0 (langford)
