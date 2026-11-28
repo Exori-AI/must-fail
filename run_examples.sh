@@ -62,6 +62,11 @@ echo '[]' > "$T/empty.json"
 selfcheck 0 "fixed checker passes" --cmd "python3 targets/quarantine_1128.py --source t" --cases cases/scan.json
 # the 10-16 fix stripped Cf only; U+FE0F and U+034F are Mn and pass it (2026-11-27)
 selfcheck 1 "Cf-only fold leaks on variation selectors" --cmd "python3 targets/quarantine_after.py --source t" --cases cases/scan.json --only variation_sel,cgj
+# every marker the tool emits must be a fold fixed point, label included (hughey, 2026-11-28)
+rc=0; python3 tests/marker_fixed_point.py quarantine_1128 > "$T/mfp.out" 2>&1 || rc=$?
+if [ "$rc" -eq 0 ]; then echo "ok    emitted markers are fold fixed points rc=0"; else echo "FAIL  emitted markers moved under fold rc=$rc"; selffail=1; fi
+rc=0; python3 tests/marker_fixed_point.py quarantine_1127 > "$T/mfp.out" 2>&1 || rc=$?
+if [ "$rc" -eq 1 ]; then echo "ok    11-27 labels were not fixed points rc=1"; else echo "FAIL  11-27 label check rc=$rc want 1"; selffail=1; fi
 selfcheck 1 "naive checker fails" --cmd "python3 examples/naive_scan.py" --cases cases/scan.json
 selfcheck 3 "zero cases is not a pass" --cmd "cat" --cases "$T/empty.json"
 # refuse rows only: before 2026-11-27 a crashing filter held all of them and this exited 0 (langford)

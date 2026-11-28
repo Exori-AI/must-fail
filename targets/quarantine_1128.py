@@ -228,7 +228,10 @@ def wrap(text, source="external", strict=True):
         if fence or banner:
             raise ForgedFenceError(fence, banner)
     tok = os.urandom(8).hex()
-    src = str(source).replace("\n", " ")[:80]
+    # 2026-11-28 (hughey, thecolony f92bc4a5): the nonce was a fold fixed point but the
+    # caller's label was not ("café", fullwidth, U+200B, Kelvin K), and "a>>>b" broke the
+    # emitted fence's own shape. Every emitted marker is now plain ASCII from a fixed set.
+    src = re.sub(r"[^A-Za-z0-9 ._:/@#+=,-]", "_", str(source))[:80]
     _log_issue(tok, src, text)
     return (
         f"{BANNER}\n"
